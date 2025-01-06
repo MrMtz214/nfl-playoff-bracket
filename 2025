@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFL Playoff Bracket</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+    .bracket {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .round {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .matchup {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+    }
+    .matchup select {
+      width: 100%;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    .super-bowl {
+      margin-top: 20px;
+      padding: 20px;
+      background: #ffeb3b;
+      border: 2px solid #f57f17;
+      border-radius: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>NFL Playoff Bracket</h1>
+
+  <div class="bracket">
+    <!-- AFC Bracket -->
+    <div class="round" id="afc">
+      <h2>AFC</h2>
+      <div class="matchup">
+        <select id="afc1">
+          <option value="Kansas City">#1 Kansas City</option>
+          <option value="Winner">Winner of Game 3</option>
+        </select>
+      </div>
+      <div class="matchup">
+        <select id="afc2">
+          <option value="Buffalo">#2 Buffalo</option>
+          <option value="Denver">#7 Denver</option>
+        </select>
+      </div>
+      <div class="matchup">
+        <select id="afc3">
+          <option value="Baltimore">#3 Baltimore</option>
+          <option value="Pittsburgh">#6 Pittsburgh</option>
+        </select>
+      </div>
+      <div class="matchup">
+        <select id="afc4">
+          <option value="Houston">#4 Houston</option>
+          <option value="LA Chargers">#5 LA Chargers</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- NFC Bracket -->
+    <div class="round" id="nfc">
+      <h2>NFC</h2>
+      <div class="matchup">
+        <select id="nfc1">
+          <option value="Detroit">#1 Detroit</option>
+          <option value="Winner">Winner of Game 3</option>
+        </select>
+      </div>
+      <div class="matchup">
+        <select id="nfc2">
+          <option value="Philadelphia">#2 Philadelphia</option>
+          <option value="Green Bay">#7 Green Bay</option>
+        </select>
+      </div>
+      <div class="matchup">
+        <select id="nfc3">
+          <option value="Tampa Bay">#3 Tampa Bay</option>
+          <option value="Washington">#6 Washington</option>
+        </select>
+      </div>
+      <div class="matchup">
+        <select id="nfc4">
+          <option value="LA Rams">#4 LA Rams</option>
+          <option value="Minnesota">#5 Minnesota</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="super-bowl">
+    <h2>Super Bowl Prediction</h2>
+    <select id="superbowl">
+      <option value="AFC Winner">AFC Winner</option>
+      <option value="NFC Winner">NFC Winner</option>
+    </select>
+  </div>
+
+  <button onclick="submitBracket()">Submit Bracket</button>
+
+  <script>
+    function submitBracket() {
+      const afc = [
+        document.getElementById('afc1').value,
+        document.getElementById('afc2').value,
+        document.getElementById('afc3').value,
+        document.getElementById('afc4').value
+      ];
+
+      const nfc = [
+        document.getElementById('nfc1').value,
+        document.getElementById('nfc2').value,
+        document.getElementById('nfc3').value,
+        document.getElementById('nfc4').value
+      ];
+
+      const superbowl = document.getElementById('superbowl').value;
+
+      alert(`Your bracket:\nAFC: ${afc.join(', ')}\nNFC: ${nfc.join(', ')}\nSuper Bowl Winner: ${superbowl}`);
+    }
+  </script>
+</body>
+</html>
