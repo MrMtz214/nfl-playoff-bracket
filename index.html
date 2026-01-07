@@ -5,184 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 NFL Playoff Bracket</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.02); }
         .matchup-card { transition: all 0.2s ease; }
-        input[type=number]::-webkit-inner-spin-button { opacity: 1; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-20">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-20 font-sans">
 
     <div class="max-w-6xl mx-auto px-4">
-        <header class="text-center py-10">
-            <h1 class="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
-                SUPER BOWL LX PREDICTOR
+        <header class="text-center py-12">
+            <h1 class="text-6xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                ROAD TO SB LX
             </h1>
-            <p class="text-slate-400 mt-2">Enter your name and predict the 2026 NFL Playoffs</p>
+            <p class="text-slate-500 mt-2 font-bold tracking-widest uppercase">Official 2026 Playoff Pool</p>
         </header>
 
-        <div id="auth-section" class="max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 mb-12 shadow-2xl">
-            <input type="text" id="userName" placeholder="Full Name" class="w-full p-3 mb-4 rounded bg-slate-900 border border-slate-700 outline-none focus:border-blue-500">
-            <input type="email" id="userEmail" placeholder="Email Address" class="w-full p-3 mb-6 rounded bg-slate-900 border border-slate-700 outline-none focus:border-blue-500">
-            <button onclick="startBracket()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded-lg font-bold uppercase transition">Start Bracket</button>
+        <div id="auth-section" class="max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl mb-12">
+            <h2 class="text-center text-xl font-bold mb-6">Create Your Entry</h2>
+            <input type="text" id="userName" placeholder="Full Name" class="w-full p-3 mb-4 rounded bg-slate-900 border border-slate-700 outline-none focus:border-blue-500 transition">
+            <input type="email" id="userEmail" placeholder="Email Address" class="w-full p-3 mb-6 rounded bg-slate-900 border border-slate-700 outline-none focus:border-blue-500 transition">
+            <button onclick="startBracket()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black uppercase tracking-widest transition shadow-lg">Begin Picks</button>
         </div>
 
-        <div id="main-content" class="hidden space-y-12">
-            <div id="bracket-render" class="grid grid-cols-1 gap-12">
-                </div>
-
+        <div id="main-content" class="hidden space-y-12 animate-in fade-in duration-700">
+            <div id="bracket-render" class="grid grid-cols-1 gap-12"></div>
             <div class="text-center pt-10 border-t border-slate-800">
-                <button onclick="submitFinalPicks()" class="bg-emerald-600 hover:bg-emerald-500 px-12 py-4 rounded-full font-black text-xl shadow-lg transition">
-                    SUBMIT MY BRACKET
+                <button onclick="submitFinalPicks()" class="bg-emerald-600 hover:bg-emerald-500 px-16 py-5 rounded-full font-black text-2xl shadow-xl transform hover:scale-105 transition">
+                    LOCK IN BRACKET
                 </button>
+            </div>
+        </div>
+
+        <div id="leaderboard-section" class="mt-20 max-w-4xl mx-auto">
+            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-400">COMMUNITY ENTRIES</h2>
+            <div class="bg-slate-800 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-900 text-slate-500 text-xs uppercase font-black">
+                        <tr>
+                            <th class="p-6">Predictor</th>
+                            <th class="p-6">SB Pick</th>
+                            <th class="p-6 text-center">Score Tiebreaker</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body" class="divide-y divide-slate-700"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
+    <div id="bracket-modal" class="hidden fixed inset-0 glass z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 w-full max-w-xl rounded-3xl border border-slate-600 p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modal-user-name" class="text-2xl font-black italic text-blue-400"></h2>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-3xl font-bold">&times;</button>
+            </div>
+            <div id="modal-content" class="space-y-4"></div>
+        </div>
+    </div>
+
 <script>
+// --- CONFIGURATION ---
+const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
+const SUPABASE_KEY = 'YOUR_ANON_KEY';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const teamData = {
-    afc: {
-        1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 3: { name: "Jaguars", id: "jax" },
-        4: { name: "Steelers", id: "pit" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" }, 7: { name: "Chargers", id: "lac" }
-    },
-    nfc: {
-        1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 3: { name: "Eagles", id: "phi" },
-        4: { name: "Panthers", id: "car" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" }, 7: { name: "Packers", id: "gb" }
-    }
+    afc: { 1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 3: { name: "Jaguars", id: "jax" }, 4: { name: "Steelers", id: "pit" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" }, 7: { name: "Chargers", id: "lac" } },
+    nfc: { 1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 3: { name: "Eagles", id: "phi" }, 4: { name: "Panthers", id: "car" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" }, 7: { name: "Packers", id: "gb" } }
 };
 
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
-function getLogo(teamId) { return `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId}.png`; }
+// --- LOGIC ---
+const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
 
 function startBracket() {
-    if(!document.getElementById('userName').value) return alert("Enter your name!");
+    if(!document.getElementById('userName').value || !document.getElementById('userEmail').value) return alert("Fill in your info!");
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     render();
 }
 
-function render() {
-    const container = document.getElementById('bracket-render');
-    container.innerHTML = '';
+async function submitFinalPicks() {
+    if(!picks.sb_winner) return alert("Finish the bracket first!");
+    const { error } = await _supabase.from('playoff_picks').insert([{
+        user_name: document.getElementById('userName').value,
+        email: document.getElementById('userEmail').value,
+        picks: picks
+    }]);
 
-    const conferences = ['afc', 'nfc'];
-    const confWrapper = document.createElement('div');
-    confWrapper.className = "grid grid-cols-1 lg:grid-cols-2 gap-8";
-
-    conferences.forEach(conf => {
-        const col = document.createElement('div');
-        col.className = "space-y-8";
-        col.innerHTML = `<h2 class="text-3xl font-black italic uppercase text-slate-600 border-b border-slate-800 pb-2">${conf}</h2>`;
-
-        // WILD CARD
-        const wcDiv = createSection("Wild Card");
-        [[2,7], [3,6], [4,5]].forEach(([h, a]) => {
-            wcDiv.appendChild(createMatchup(conf, 'wc', `${h}v${a}`, h, a));
-        });
-        col.appendChild(wcDiv);
-
-        // DIVISIONAL (Reseeding)
-        const wcWinners = Object.values(picks[conf].wc);
-        if(wcWinners.length === 3) {
-            const divSection = createSection("Divisional");
-            const sorted = [1, ...wcWinners].sort((a,b) => a-b);
-            const matchups = [{h: sorted[0], a: sorted[3]}, {h: sorted[1], a: sorted[2]}];
-            matchups.forEach((m, i) => divSection.appendChild(createMatchup(conf, 'div', `d${i}`, m.h, m.a)));
-            col.appendChild(divSection);
-        }
-
-        // CONFERENCE CHAMP
-        const divWinners = Object.values(picks[conf].div);
-        if(divWinners.length === 2) {
-            const ccSection = createSection("Championship");
-            ccSection.appendChild(createMatchup(conf, 'conf', 'champ', divWinners[0], divWinners[1]));
-            col.appendChild(ccSection);
-        }
-        confWrapper.appendChild(col);
-    });
-    container.appendChild(confWrapper);
-
-    // SUPER BOWL
-    if(picks.afc.conf && picks.nfc.conf) {
-        const sbDiv = document.createElement('div');
-        sbDiv.className = "mt-12 p-8 bg-slate-800 rounded-3xl border-4 border-yellow-500/30 max-w-2xl mx-auto shadow-2xl";
-        sbDiv.innerHTML = `<h2 class="text-4xl font-black text-center mb-8 italic">SUPER BOWL LX</h2>`;
-        
-        const matchup = document.createElement('div');
-        matchup.className = "flex justify-around items-center mb-8";
-        
-        [ {conf: 'afc', s: picks.afc.conf}, {conf: 'nfc', s: picks.nfc.conf} ].forEach(team => {
-            const isWinner = picks.sb_winner === team.s;
-            matchup.innerHTML += `
-                <div onclick="setSBWinner(${team.s})" class="text-center cursor-pointer p-4 rounded-xl transition ${isWinner ? 'bg-blue-600 scale-110' : 'hover:bg-slate-700'}">
-                    <img src="${getLogo(teamData[team.conf][team.s].id)}" class="w-24 h-24 mx-auto mb-2">
-                    <div class="font-bold">${teamData[team.conf][team.s].name}</div>
-                </div>
-            `;
-        });
-        
-        sbDiv.appendChild(matchup);
-        sbDiv.innerHTML += `
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-700">
-                <p class="text-center text-sm font-bold text-slate-500 uppercase mb-4 tracking-widest text-yellow-500">Final Score Tiebreaker</p>
-                <div class="flex justify-center items-center gap-8">
-                    <div class="text-center">
-                        <label class="block text-xs mb-1">AFC Score</label>
-                        <input type="number" onchange="picks.sb_score.afc=this.value" class="w-20 text-center p-3 text-2xl font-bold bg-slate-800 border border-slate-600 rounded">
-                    </div>
-                    <div class="text-2xl font-black text-slate-700">VS</div>
-                    <div class="text-center">
-                        <label class="block text-xs mb-1">NFC Score</label>
-                        <input type="number" onchange="picks.sb_score.nfc=this.value" class="w-20 text-center p-3 text-2xl font-bold bg-slate-800 border border-slate-600 rounded">
-                    </div>
-                </div>
-            </div>
-        `;
-        container.appendChild(sbDiv);
+    if(error) {
+        alert(error.code === '23505' ? "This email has already submitted!" : error.message);
+    } else {
+        alert("Bracket submitted successfully!");
+        location.reload();
     }
 }
 
-function createSection(title) {
-    const div = document.createElement('div');
-    div.innerHTML = `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">${title}</h3>`;
-    return div;
-}
-
-function createMatchup(conf, round, mId, hS, aS) {
-    const card = document.createElement('div');
-    card.className = "bg-slate-800 border border-slate-700 rounded-xl overflow-hidden mb-4 shadow-lg";
-    [hS, aS].forEach(seed => {
-        const isSelected = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mId] === seed;
-        const btn = document.createElement('button');
-        btn.className = `w-full p-4 flex items-center gap-4 hover:bg-slate-700 transition ${isSelected ? 'selected' : ''}`;
-        btn.innerHTML = `
-            <span class="text-xs font-bold w-4 text-slate-500">${seed}</span>
-            <img src="${getLogo(teamData[conf][seed].id)}" class="w-8 h-8">
-            <span class="font-bold">${teamData[conf][seed].name}</span>
-        `;
-        btn.onclick = () => {
-            if(round === 'conf') picks[conf].conf = seed;
-            else {
-                picks[conf][round][mId] = seed;
-                if(round === 'wc') { picks[conf].div = {}; picks[conf].conf = null; }
-                if(round === 'div') { picks[conf].conf = null; }
-            }
-            picks.sb_winner = null;
-            render();
-        };
-        card.appendChild(btn);
+async function loadLeaderboard() {
+    const { data } = await _supabase.from('playoff_picks').select('*').order('created_at', { ascending: false });
+    const tbody = document.getElementById('leaderboard-body');
+    data?.forEach(entry => {
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-700/50 transition cursor-pointer";
+        row.onclick = () => openModal(entry.user_name, entry.picks);
+        const winId = entry.picks.sb_winner;
+        const winConf = winId <= 7 ? 'afc' : 'nfc';
+        row.innerHTML = `<td class="p-6 font-bold">🔍 ${entry.user_name}</td>
+            <td class="p-6 flex items-center gap-3"><img src="${getLogo(teamData[winConf][winId].id)}" class="w-8 h-8">${teamData[winConf][winId].name}</td>
+            <td class="p-6 text-center font-mono text-emerald-400 font-bold">${entry.picks.sb_score.afc} - ${entry.picks.sb_score.nfc}</td>`;
+        tbody.appendChild(row);
     });
-    return card;
 }
 
-function setSBWinner(seed) { picks.sb_winner = seed; render(); }
+// (Insert the render, openModal, and createMatchup functions from previous steps here)
+// ... [Placeholder for the rendering logic provided in the previous turn] ...
 
-function submitFinalPicks() {
-    if(!picks.sb_winner) return alert("Finish the bracket first!");
-    console.log("FINAL SUBMISSION:", { user: document.getElementById('userName').value, picks });
-    alert("Bracket Saved! Good luck in the pool!");
-}
+loadLeaderboard();
 </script>
 </body>
 </html>
