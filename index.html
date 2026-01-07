@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL 2026 Playoff Pool | $25 Entry</title>
+    <title>NFL 2026 Playoff Pool | $25 Winner Take All</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -12,9 +12,68 @@
         .glass { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .sb-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .rank-1 { color: #fbbf24; font-size: 1.25rem; font-weight: 900; } /* Gold */
+        .rank-2 { color: #94a3b8; font-weight: 700; } /* Silver */
+        .rank-3 { color: #b45309; font-weight: 700; } /* Bronze */
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans selection:bg-blue-500/30">
+
+    <div id="rules-overlay" class="fixed inset-0 z-[100] glass flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-lg rounded-3xl border border-blue-500/30 p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <h2 class="text-3xl font-black italic text-blue-400 mb-2 text-center uppercase">Pool Rules & Scoring</h2>
+            <p class="text-slate-500 text-[10px] font-black tracking-widest uppercase mb-6 text-center underline decoration-blue-500/30">Read before entering</p>
+            
+            <div class="space-y-6 mb-8">
+                <div class="flex items-center gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+                    <div class="text-center">
+                        <span class="block text-[10px] font-black text-slate-500 uppercase tracking-tighter">Entry Fee</span>
+                        <span class="text-3xl italic font-black text-emerald-400">$25</span>
+                    </div>
+                    <div class="h-10 w-px bg-slate-800"></div>
+                    <p class="text-xs text-slate-400 leading-tight">
+                        <b class="text-white uppercase">Winner Take All:</b> 
+                        One champion takes the entire pot. Entry must be paid to the commissioner before kickoff.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+                    <h4 class="text-[11px] text-blue-400 font-black uppercase tracking-widest mb-3 italic">How Points are Tallied</h4>
+                    <p class="text-[11px] text-slate-400 leading-relaxed mb-4">
+                        Points are <b class="text-white underline">cumulative</b>. You earn points for every correct team you advance through the bracket. If your Wild Card winner also wins the Divisional round, you earn both sets of points!
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
+                            <span class="text-[11px] font-bold uppercase">Wild Card Round</span>
+                            <span class="text-blue-400 font-black">5 PTS <small class="text-[9px] text-slate-500 font-normal">per win</small></span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
+                            <span class="text-[11px] font-bold uppercase">Divisional Round</span>
+                            <span class="text-blue-400 font-black">10 PTS <small class="text-[9px] text-slate-500 font-normal">per win</small></span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
+                            <span class="text-[11px] font-bold uppercase">Conf. Championship</span>
+                            <span class="text-blue-400 font-black">15 PTS <small class="text-[9px] text-slate-500 font-normal">per win</small></span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
+                            <span class="text-[11px] font-bold uppercase">Super Bowl Winner</span>
+                            <span class="text-blue-400 font-black">20 PTS <small class="text-[9px] text-slate-500 font-normal">final win</small></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-900/10 p-4 rounded-xl border border-blue-500/20">
+                    <p class="text-[10px] text-slate-300 italic">
+                        <b>Tiebreaker:</b> If total points are tied, the person who predicted closest to the <b>Total Combined Score</b> of the Super Bowl wins the pot.
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="acceptRules()" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-blue-900/20">
+                I Understand & Accept
+            </button>
+        </div>
+    </div>
 
     <div class="max-w-6xl mx-auto px-4">
         <header class="text-center py-12">
@@ -26,26 +85,11 @@
         </header>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12">
-            <div class="mb-8 p-6 bg-slate-950/50 rounded-2xl border border-blue-500/30">
-                <h3 class="text-blue-400 font-black italic uppercase tracking-widest text-[10px] mb-4">Official Pool Rules</h3>
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded">ENTRY</span>
-                    <span class="text-xl font-bold text-emerald-400">$25.00</span>
-                    <span class="text-slate-500 text-[10px] font-bold uppercase italic ml-auto">Winner Take All</span>
-                </div>
-                <ul class="space-y-2 text-[11px] text-slate-400 font-medium">
-                    <li class="flex justify-between border-b border-slate-800 pb-1"><span>Wild Card Pick</span><span class="text-white">5 PTS</span></li>
-                    <li class="flex justify-between border-b border-slate-800 pb-1"><span>Divisional Pick</span><span class="text-white">10 PTS</span></li>
-                    <li class="flex justify-between border-b border-slate-800 pb-1"><span>Championship Pick</span><span class="text-white">15 PTS</span></li>
-                    <li class="flex justify-between"><span>Super Bowl Winner</span><span class="text-white">20 PTS</span></li>
-                </ul>
-            </div>
-
-            <h2 class="text-center text-sm font-bold mb-6 italic text-slate-400 uppercase tracking-widest">Sign-In to Enter</h2>
+            <h2 class="text-center text-sm font-bold mb-6 italic text-slate-400 uppercase tracking-widest">Predictor Sign-In</h2>
             <div class="space-y-4">
                 <input type="text" id="userName" placeholder="Full Name" class="w-full p-4 rounded-xl bg-black border border-slate-700 outline-none focus:border-blue-500 transition-all text-white">
                 <input type="email" id="userEmail" placeholder="Email Address" class="w-full p-4 rounded-xl bg-black border border-slate-700 outline-none focus:border-blue-500 transition-all text-white">
-                <button onclick="handleLogin()" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Enter Pool</button>
+                <button onclick="handleLogin()" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Start My Bracket</button>
             </div>
         </div>
 
@@ -59,15 +103,16 @@
         </div>
 
         <div id="leaderboard-section" class="mt-24 max-w-5xl mx-auto">
-            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-600 uppercase tracking-tighter">Live Standings</h2>
-            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
+            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-600 uppercase tracking-tighter">Predictor Standings</h2>
+            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl text-center">
                 <table class="w-full text-left">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
                         <tr>
+                            <th class="p-6 w-16 text-center">Rank</th>
                             <th class="p-6">Predictor</th>
                             <th class="p-6 text-center">Score</th>
-                            <th class="p-6">Super Bowl Winner</th>
-                            <th class="p-6 text-center">Tiebreaker</th>
+                            <th class="p-6">SB Winner</th>
+                            <th class="p-6 text-center">TB</th>
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm"></tbody>
@@ -77,12 +122,14 @@
     </div>
 
 <script>
-// --- CONFIGURATION ---
+// (Include all JavaScript logic: Config, realResults, teamData, Auth, Scoring, and Render)
+// Make sure to include the logic that calculates the "Rank" column provided previously.
+// Call init() at the end.
+
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- MASTER RESULTS (Update these with IDs as games finish) ---
 const realResults = {
     afc: { wc: { "2v7": null, "3v6": null, "4v5": null }, div: { d0: null, d1: null }, conf: null },
     nfc: { wc: { "2v7": null, "3v6": null, "4v5": null }, div: { d0: null, d1: null }, conf: null },
@@ -98,9 +145,9 @@ let currentUser = null;
 let roundLocks = { wildcard: false, divisional: false, championship: false, superbowl: false };
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
+function acceptRules() { document.getElementById('rules-overlay').classList.add('hidden'); }
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
 
-// --- SCORING ---
 function calculatePoints(uP) {
     let pts = 0;
     ['afc', 'nfc'].forEach(c => {
@@ -112,7 +159,8 @@ function calculatePoints(uP) {
     return pts;
 }
 
-// --- INITIALIZATION ---
+// (Remaining Auth/Render logic same as before...)
+// ...
 async function init() {
     const { data: { session } } = await _supabase.auth.getSession();
     if (session) {
@@ -120,7 +168,7 @@ async function init() {
         await loadUserData();
         document.getElementById('auth-section').classList.add('hidden');
         document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('user-display').innerText = `POOL ID: ${currentUser.email}`;
+        document.getElementById('user-display').innerText = `LOGGED IN: ${currentUser.email}`;
         document.getElementById('user-display').classList.remove('hidden');
         document.getElementById('logout-btn').classList.remove('hidden');
     }
@@ -138,26 +186,28 @@ async function handleLogin() {
         email: e, options: { data: { full_name: n }, emailRedirectTo: window.location.href }
     });
     if (error) alert(error.message);
-    else alert("Check your email for the Magic Link to sign in!");
+    else alert("Success! Check your email for the Magic Link to start your bracket.");
 }
 
 async function loadUserData() {
     const { data } = await _supabase.from('playoff_picks').select('*').eq('id', currentUser.id).single();
-    if (data) picks = data.picks;
+    if (data) {
+        picks = data.picks;
+        document.getElementById('userName').value = data.user_name;
+    }
 }
 
 async function saveBracket() {
     const { error } = await _supabase.from('playoff_picks').upsert({
-        id: currentUser.id, user_name: document.getElementById('userName').value || 'User',
+        id: currentUser.id, user_name: document.getElementById('userName').value || 'Predictor',
         email: currentUser.email, picks: picks
     });
     if (error) alert(error.message);
-    else alert("Success! Your bracket is locked and updated.");
+    else alert("Your entries have been saved successfully!");
 }
 
 function handleLogout() { _supabase.auth.signOut(); location.reload(); }
 
-// --- RENDER ---
 function render() {
     const container = document.getElementById('bracket-render');
     container.innerHTML = '';
@@ -220,8 +270,8 @@ function createRoundUI(conf, round, title, matchups, isLocked) {
 
 function renderSuperBowl(c) {
     const sbDiv = document.createElement('div');
-    sbDiv.className = "mt-20 p-12 bg-gradient-to-br from-slate-900 to-black rounded-[3rem] border-2 border-yellow-500/20 shadow-2xl max-w-3xl mx-auto";
-    sbDiv.innerHTML = `<h2 class="text-center text-5xl font-black italic mb-12 tracking-tighter text-yellow-500 uppercase">Super Bowl LX</h2>`;
+    sbDiv.className = "mt-20 p-12 bg-gradient-to-br from-slate-900 to-black rounded-[3rem] border-2 border-yellow-500/20 shadow-2xl max-w-3xl mx-auto text-center";
+    sbDiv.innerHTML = `<h2 class="text-5xl font-black italic mb-12 tracking-tighter text-yellow-500 uppercase">Super Bowl LX</h2>`;
     const flex = document.createElement('div');
     flex.className = "flex flex-col md:flex-row justify-center items-center gap-12 mb-12";
     [{c:'afc', s:picks.afc.conf}, {c:'nfc', s:picks.nfc.conf}].forEach(t => {
@@ -238,12 +288,14 @@ function renderSuperBowl(c) {
     scoreUI.className = "bg-black/50 p-8 rounded-3xl border border-slate-800";
     scoreUI.innerHTML = `<p class="text-center text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mb-6 italic">Tiebreaker: Combined Total Score</p>
         <div class="flex justify-center items-center gap-12 text-center">
-            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">AFC</label><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score.afc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">AFC</label><input type="number" id="afc-score" value="${picks.sb_score.afc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
             <div class="text-2xl font-black italic text-slate-700">VS</div>
-            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">NFC</label><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score.nfc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">NFC</label><input type="number" id="nfc-score" value="${picks.sb_score.nfc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
         </div>`;
     sbDiv.appendChild(scoreUI);
     c.appendChild(sbDiv);
+    document.getElementById('afc-score').oninput = (e) => picks.sb_score.afc = e.target.value;
+    document.getElementById('nfc-score').oninput = (e) => picks.sb_score.nfc = e.target.value;
 }
 
 async function loadLeaderboard() {
@@ -252,11 +304,21 @@ async function loadLeaderboard() {
     if(!data) return;
     const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
     tbody.innerHTML = '';
-    scored.forEach(e => {
+    scored.forEach((e, idx) => {
         const win = e.picks.sb_winner;
         const team = teamData[win <= 7 ? 'afc' : 'nfc'][win];
         const r = document.createElement('tr');
-        r.innerHTML = `<td class="p-6 font-bold uppercase text-[11px]">${e.user_name}</td><td class="p-6 text-center text-blue-400 font-black text-xl">${e.pts}</td><td class="p-6 flex items-center gap-3 italic uppercase font-black text-xs"><img src="${getLogo(team?.id || 'nfl')}" class="w-6 h-6">${team?.name || 'TBD'}</td><td class="p-6 text-center text-emerald-400 font-bold">${e.picks.sb_score.afc}-${e.picks.sb_score.nfc}</td>`;
+        r.className = "hover:bg-slate-800 transition cursor-pointer text-center";
+        r.innerHTML = `
+            <td class="p-6 font-black ${idx < 3 ? 'rank-' + (idx + 1) : 'text-slate-600'}">
+                ${idx === 0 ? '🏆' : '#' + (idx + 1)}
+            </td>
+            <td class="p-6 font-bold uppercase text-[11px] text-white tracking-widest text-left">${e.user_name}</td>
+            <td class="p-6 text-center text-blue-400 font-black text-xl">${e.pts}</td>
+            <td class="p-6 flex items-center gap-3 italic uppercase font-black text-xs text-slate-300 text-left">
+                <img src="${getLogo(team?.id || 'nfl')}" class="w-6 h-6">${team?.name || 'TBD'}
+            </td>
+            <td class="p-6 text-center text-emerald-400 font-bold font-mono">${e.picks.sb_score.afc}-${e.picks.sb_score.nfc}</td>`;
         tbody.appendChild(r);
     });
 }
