@@ -3,119 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 NFL Playoff Predictor</title>
+    <title>2026 NFL Playoff Bracket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .selected { background-color: #2563eb !important; border-color: #60a5fa !important; color: white !important; }
-        .matchup-card { transition: all 0.3s ease; }
+        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.02); }
+        .matchup-card { transition: all 0.2s ease; }
+        input[type=number]::-webkit-inner-spin-button { opacity: 1; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 pb-20">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-20">
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-6xl mx-auto px-4">
         <header class="text-center py-10">
-            <h1 class="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 mb-2">
-                ROAD TO SUPER BOWL LX
+            <h1 class="text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                SUPER BOWL LX PREDICTOR
             </h1>
-            <p class="text-slate-400">2026 Official NFL Playoff Bracket</p>
+            <p class="text-slate-400 mt-2">Enter your name and predict the 2026 NFL Playoffs</p>
         </header>
 
-        <div id="auth-section" class="max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl mb-12">
-            <h2 class="text-xl font-bold mb-4 text-center">Enter your details to start</h2>
-            <div class="space-y-4">
-                <input type="text" id="userName" placeholder="Full Name" class="w-full p-3 rounded bg-slate-900 border border-slate-700 focus:border-blue-500 outline-none">
-                <input type="email" id="userEmail" placeholder="Email Address" class="w-full p-3 rounded bg-slate-900 border border-slate-700 focus:border-blue-500 outline-none">
-                <button onclick="startBracket()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded-lg font-bold uppercase tracking-wider transition">Enter Bracket Pool</button>
-            </div>
+        <div id="auth-section" class="max-w-md mx-auto bg-slate-800 p-8 rounded-2xl border border-slate-700 mb-12 shadow-2xl">
+            <input type="text" id="userName" placeholder="Full Name" class="w-full p-3 mb-4 rounded bg-slate-900 border border-slate-700 outline-none focus:border-blue-500">
+            <input type="email" id="userEmail" placeholder="Email Address" class="w-full p-3 mb-6 rounded bg-slate-900 border border-slate-700 outline-none focus:border-blue-500">
+            <button onclick="startBracket()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded-lg font-bold uppercase transition">Start Bracket</button>
         </div>
 
         <div id="main-content" class="hidden space-y-12">
-            <div id="bracket-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div id="bracket-render" class="grid grid-cols-1 gap-12">
                 </div>
 
             <div class="text-center pt-10 border-t border-slate-800">
-                <button onclick="submitPicks()" class="bg-emerald-600 hover:bg-emerald-500 px-12 py-4 rounded-full font-black text-2xl shadow-lg transform hover:scale-105 transition">
-                    SAVE MY PICKS
+                <button onclick="submitFinalPicks()" class="bg-emerald-600 hover:bg-emerald-500 px-12 py-4 rounded-full font-black text-xl shadow-lg transition">
+                    SUBMIT MY BRACKET
                 </button>
             </div>
         </div>
     </div>
 
 <script>
-// Official 2026 Teams
-const teams = {
-    afc: { 1: "Denver Broncos", 2: "New England Patriots", 3: "Jacksonville Jaguars", 4: "Pittsburgh Steelers", 5: "Houston Texans", 6: "Buffalo Bills", 7: "Los Angeles Chargers" },
-    nfc: { 1: "Seattle Seahawks", 2: "Chicago Bears", 3: "Philadelphia Eagles", 4: "Carolina Panthers", 5: "Los Angeles Rams", 6: "San Francisco 49ers", 7: "Green Bay Packers" }
+const teamData = {
+    afc: {
+        1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 3: { name: "Jaguars", id: "jax" },
+        4: { name: "Steelers", id: "pit" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" }, 7: { name: "Chargers", id: "lac" }
+    },
+    nfc: {
+        1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 3: { name: "Eagles", id: "phi" },
+        4: { name: "Panthers", id: "car" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" }, 7: { name: "Packers", id: "gb" }
+    }
 };
 
-let picks = {
-    afc: { wc: {}, div: {} },
-    nfc: { wc: {}, div: {} }
-};
+let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
+
+function getLogo(teamId) { return `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId}.png`; }
 
 function startBracket() {
-    const name = document.getElementById('userName').value;
-    const email = document.getElementById('userEmail').value;
-    if(!name || !email) return alert("Please fill in both fields.");
-    
+    if(!document.getElementById('userName').value) return alert("Enter your name!");
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     render();
 }
 
 function render() {
-    const grid = document.getElementById('bracket-grid');
-    grid.innerHTML = '';
+    const container = document.getElementById('bracket-render');
+    container.innerHTML = '';
 
-    ['afc', 'nfc'].forEach(conf => {
-        const confContainer = document.createElement('div');
-        confContainer.className = "space-y-6";
-        confContainer.innerHTML = `<h2 class="text-3xl font-black italic uppercase text-slate-500 mb-4">${conf}</h2>`;
+    const conferences = ['afc', 'nfc'];
+    const confWrapper = document.createElement('div');
+    confWrapper.className = "grid grid-cols-1 lg:grid-cols-2 gap-8";
 
-        // 1. Wild Card Round UI
-        const wcSection = createRoundSection("Wild Card Weekend");
+    conferences.forEach(conf => {
+        const col = document.createElement('div');
+        col.className = "space-y-8";
+        col.innerHTML = `<h2 class="text-3xl font-black italic uppercase text-slate-600 border-b border-slate-800 pb-2">${conf}</h2>`;
+
+        // WILD CARD
+        const wcDiv = createSection("Wild Card");
         [[2,7], [3,6], [4,5]].forEach(([h, a]) => {
-            wcSection.appendChild(createMatchupCard(conf, 'wc', `${h}v${a}`, h, a));
+            wcDiv.appendChild(createMatchup(conf, 'wc', `${h}v${a}`, h, a));
         });
-        confContainer.appendChild(wcSection);
+        col.appendChild(wcDiv);
 
-        // 2. Divisional Logic (The Reseeding Magic)
+        // DIVISIONAL (Reseeding)
         const wcWinners = Object.values(picks[conf].wc);
-        if (wcWinners.length === 3) {
-            const divSection = createRoundSection("Divisional Round (Reseeded)");
-            const remaining = [1, ...wcWinners].sort((a,b) => a-b);
-            
-            // NFL Rule: #1 vs Lowest, 2nd vs 3rd
-            const matchups = [{h: remaining[0], a: remaining[3]}, {h: remaining[1], a: remaining[2]}];
-            
-            matchups.forEach((m, i) => {
-                divSection.appendChild(createMatchupCard(conf, 'div', `div${i}`, m.h, m.a));
-            });
-            confContainer.appendChild(divSection);
+        if(wcWinners.length === 3) {
+            const divSection = createSection("Divisional");
+            const sorted = [1, ...wcWinners].sort((a,b) => a-b);
+            const matchups = [{h: sorted[0], a: sorted[3]}, {h: sorted[1], a: sorted[2]}];
+            matchups.forEach((m, i) => divSection.appendChild(createMatchup(conf, 'div', `d${i}`, m.h, m.a)));
+            col.appendChild(divSection);
         }
 
-        grid.appendChild(confContainer);
+        // CONFERENCE CHAMP
+        const divWinners = Object.values(picks[conf].div);
+        if(divWinners.length === 2) {
+            const ccSection = createSection("Championship");
+            ccSection.appendChild(createMatchup(conf, 'conf', 'champ', divWinners[0], divWinners[1]));
+            col.appendChild(ccSection);
+        }
+        confWrapper.appendChild(col);
     });
+    container.appendChild(confWrapper);
+
+    // SUPER BOWL
+    if(picks.afc.conf && picks.nfc.conf) {
+        const sbDiv = document.createElement('div');
+        sbDiv.className = "mt-12 p-8 bg-slate-800 rounded-3xl border-4 border-yellow-500/30 max-w-2xl mx-auto shadow-2xl";
+        sbDiv.innerHTML = `<h2 class="text-4xl font-black text-center mb-8 italic">SUPER BOWL LX</h2>`;
+        
+        const matchup = document.createElement('div');
+        matchup.className = "flex justify-around items-center mb-8";
+        
+        [ {conf: 'afc', s: picks.afc.conf}, {conf: 'nfc', s: picks.nfc.conf} ].forEach(team => {
+            const isWinner = picks.sb_winner === team.s;
+            matchup.innerHTML += `
+                <div onclick="setSBWinner(${team.s})" class="text-center cursor-pointer p-4 rounded-xl transition ${isWinner ? 'bg-blue-600 scale-110' : 'hover:bg-slate-700'}">
+                    <img src="${getLogo(teamData[team.conf][team.s].id)}" class="w-24 h-24 mx-auto mb-2">
+                    <div class="font-bold">${teamData[team.conf][team.s].name}</div>
+                </div>
+            `;
+        });
+        
+        sbDiv.appendChild(matchup);
+        sbDiv.innerHTML += `
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-700">
+                <p class="text-center text-sm font-bold text-slate-500 uppercase mb-4 tracking-widest text-yellow-500">Final Score Tiebreaker</p>
+                <div class="flex justify-center items-center gap-8">
+                    <div class="text-center">
+                        <label class="block text-xs mb-1">AFC Score</label>
+                        <input type="number" onchange="picks.sb_score.afc=this.value" class="w-20 text-center p-3 text-2xl font-bold bg-slate-800 border border-slate-600 rounded">
+                    </div>
+                    <div class="text-2xl font-black text-slate-700">VS</div>
+                    <div class="text-center">
+                        <label class="block text-xs mb-1">NFC Score</label>
+                        <input type="number" onchange="picks.sb_score.nfc=this.value" class="w-20 text-center p-3 text-2xl font-bold bg-slate-800 border border-slate-600 rounded">
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(sbDiv);
+    }
 }
 
-function createRoundSection(title) {
+function createSection(title) {
     const div = document.createElement('div');
-    div.innerHTML = `<h3 class="text-blue-400 font-bold text-sm uppercase mb-3">${title}</h3>`;
+    div.innerHTML = `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">${title}</h3>`;
     return div;
 }
 
-function createMatchupCard(conf, round, matchId, hSeed, aSeed) {
+function createMatchup(conf, round, mId, hS, aS) {
     const card = document.createElement('div');
-    card.className = "bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-3 matchup-card";
-    
-    [hSeed, aSeed].forEach(seed => {
-        const isSelected = picks[conf][round][matchId] === seed;
+    card.className = "bg-slate-800 border border-slate-700 rounded-xl overflow-hidden mb-4 shadow-lg";
+    [hS, aS].forEach(seed => {
+        const isSelected = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mId] === seed;
         const btn = document.createElement('button');
-        btn.className = `w-full text-left p-4 flex justify-between items-center hover:bg-slate-700 border-b border-slate-700 last:border-0 ${isSelected ? 'selected' : ''}`;
-        btn.innerHTML = `<span><b class="text-slate-500 mr-2">${seed}</b> ${teams[conf][seed]}</span>`;
+        btn.className = `w-full p-4 flex items-center gap-4 hover:bg-slate-700 transition ${isSelected ? 'selected' : ''}`;
+        btn.innerHTML = `
+            <span class="text-xs font-bold w-4 text-slate-500">${seed}</span>
+            <img src="${getLogo(teamData[conf][seed].id)}" class="w-8 h-8">
+            <span class="font-bold">${teamData[conf][seed].name}</span>
+        `;
         btn.onclick = () => {
-            picks[conf][round][matchId] = seed;
-            if (round === 'wc') picks[conf].div = {}; // Reset next round if logic changes
+            if(round === 'conf') picks[conf].conf = seed;
+            else {
+                picks[conf][round][mId] = seed;
+                if(round === 'wc') { picks[conf].div = {}; picks[conf].conf = null; }
+                if(round === 'div') { picks[conf].conf = null; }
+            }
+            picks.sb_winner = null;
             render();
         };
         card.appendChild(btn);
@@ -123,10 +176,12 @@ function createMatchupCard(conf, round, matchId, hSeed, aSeed) {
     return card;
 }
 
-function submitPicks() {
-    const name = document.getElementById('userName').value;
-    alert(`Congrats ${name}! Your bracket has been simulated. Check the browser console (F12) to see your JSON data.`);
-    console.log("FINAL PICKS:", picks);
+function setSBWinner(seed) { picks.sb_winner = seed; render(); }
+
+function submitFinalPicks() {
+    if(!picks.sb_winner) return alert("Finish the bracket first!");
+    console.log("FINAL SUBMISSION:", { user: document.getElementById('userName').value, picks });
+    alert("Bracket Saved! Good luck in the pool!");
 }
 </script>
 </body>
