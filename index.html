@@ -239,4 +239,29 @@ function renderSuperBowl(c) {
     scoreUI.innerHTML = `<p class="text-center text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mb-6 italic">Tiebreaker: Combined Total Score</p>
         <div class="flex justify-center items-center gap-12 text-center">
             <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">AFC</label><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score.afc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
-            <div class="text-2xl font-black italic text-slate-7
+            <div class="text-2xl font-black italic text-slate-700">VS</div>
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">NFC</label><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score.nfc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+        </div>`;
+    sbDiv.appendChild(scoreUI);
+    c.appendChild(sbDiv);
+}
+
+async function loadLeaderboard() {
+    const { data } = await _supabase.from('playoff_picks').select('*');
+    const tbody = document.getElementById('leaderboard-body');
+    if(!data) return;
+    const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
+    tbody.innerHTML = '';
+    scored.forEach(e => {
+        const win = e.picks.sb_winner;
+        const team = teamData[win <= 7 ? 'afc' : 'nfc'][win];
+        const r = document.createElement('tr');
+        r.innerHTML = `<td class="p-6 font-bold uppercase text-[11px]">${e.user_name}</td><td class="p-6 text-center text-blue-400 font-black text-xl">${e.pts}</td><td class="p-6 flex items-center gap-3 italic uppercase font-black text-xs"><img src="${getLogo(team?.id || 'nfl')}" class="w-6 h-6">${team?.name || 'TBD'}</td><td class="p-6 text-center text-emerald-400 font-bold">${e.picks.sb_score.afc}-${e.picks.sb_score.nfc}</td>`;
+        tbody.appendChild(r);
+    });
+}
+
+init();
+</script>
+</body>
+</html>
