@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 NFL Playoff Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .winner-btn { transition: all 0.2s; }
+        .selected { background-color: #2563eb !important; border-color: #60a5fa !important; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans p-4">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-black italic tracking-tighter text-blue-500">SUPER BOWL LX BRACKET</h1>
+            <p class="text-slate-400">Pick your winners. Matches reseed automatically.</p>
+        </header>
+
+        <div id="bracket-container" class="space-y-12">
+            </div>
+    </div>
+
+<script>
+const teams = {
+    afc: { 1: "Broncos", 2: "Patriots", 3: "Jaguars", 4: "Steelers", 5: "Texans", 6: "Bills", 7: "Chargers" },
+    nfc: { 1: "Seahawks", 2: "Bears", 3: "Eagles", 4: "Panthers", 5: "Rams", 6: "49ers", 7: "Packers" }
+};
+
+let picks = {
+    afc: { wc: {}, div: {}, conf: {} },
+    nfc: { wc: {}, div: {}, conf: {} },
+    sb: null
+};
+
+function render() {
+    const container = document.getElementById('bracket-container');
+    container.innerHTML = '';
+
+    ['afc', 'nfc'].forEach(conf => {
+        const confDiv = document.createElement('div');
+        confDiv.className = "bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl";
+        confDiv.innerHTML = `<h2 class="text-2xl font-bold mb-4 uppercase text-slate-300 border-b border-slate-700 pb-2">${conf} Conference</h2>`;
+
+        // 1. Wild Card Round
+        const wcGrid = document.createElement('div');
+        wcGrid.className = "grid grid-cols-1 md:grid-cols-3 gap-4 mb-8";
+        [[2,7], [3,6], [4,5]].forEach(([h, a]) => {
+            wcGrid.innerHTML += createMatchupUI(conf, 'wc', `${h}v${a}`, h, a);
+        });
+        confDiv.appendChild(wcGrid);
+
+        // 2. Divisional Round (Dynamic Logic)
+        const wcWinners = Object.values(picks[conf].wc);
+        if (wcWinners.length === 3) {
+            const divTitle = document.createElement('h3');
+            divTitle.className = "text-lg font-semibold text-blue-400 mb-2 mt-4";
+            divTitle.innerText = "Divisional Round (Reseeded)";
+            confDiv.appendChild(divTitle);
+
+            const remainingSeeds = [1, ...wcWinners].sort((a,b) => a-b);
+            const divMatchups = [
+                {h: remainingSeeds[0], a: remainingSeeds[3]}, // #1 vs Lowest
+                {h: remainingSeeds[1], a: remainingSeeds[2]}  // 2nd vs 3rd
+            ];
+
+            const divGrid = document.createElement('div');
+            divGrid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
+            divMatchups.forEach((m, i) => {
+                divGrid.innerHTML += createMatchupUI(conf, 'div', `div${i}`, m.h, m.a);
+            });
+            confDiv.appendChild(divGrid);
+        }
+        container.appendChild(confDiv);
+    });
+}
+
+function createMatchupUI(conf, round, matchId, hSeed, aSeed) {
+    const hName = teams[conf][hSeed];
+    const aName = teams[conf][aSeed];
+    const currentWinner = picks[conf][round][matchId];
+
+    return `
+        <div class="flex flex-col bg-slate-900 p-2 rounded border border-slate-600">
+            <button onclick="makePick('${conf}', '${round}', '${matchId}', ${hSeed})" 
+                class="winner-btn text-left p-2 mb-1 rounded hover:bg-slate-700 ${currentWinner == hSeed ? 'selected' : ''}">
+                <span class="text-xs text-slate-500 mr-2">${hSeed}</span> ${hName}
+            </button>
+            <button onclick="makePick('${conf}', '${round}', '${matchId}', ${aSeed})" 
+                class="winner-btn text-left p-2 rounded hover:bg-slate-700 ${currentWinner == aSeed ? 'selected' : ''}">
+                <span class="text-xs text-slate-500 mr-2">${aSeed}</span> ${aName}
+            </button>
+        </div>
+    `;
+}
+
+function makePick(conf, round, matchId, winnerSeed) {
+    picks[conf][round][matchId] = winnerSeed;
+    // Clear subsequent rounds if a previous round pick changes
+    if (round === 'wc') picks[conf].div = {};
+    render();
+}
+
+render();
+</script>
+</body>
+</html>
