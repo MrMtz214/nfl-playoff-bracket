@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL 2026 Playoff Pool | Google Sign-In</title>
+    <title>NFL 2026 Playoff Pool | $25 Winner Take All</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -14,7 +14,7 @@
         .rank-3 { color: #b45309; font-weight: 700; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans selection:bg-blue-500/30">
 
     <div id="rules-overlay" class="fixed inset-0 z-[100] glass flex items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-lg rounded-3xl border border-blue-500/30 p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
@@ -26,11 +26,10 @@
                         <span class="text-3xl italic font-black text-emerald-400">$25</span>
                     </div>
                     <div class="h-10 w-px bg-slate-800"></div>
-                    <p class="text-xs text-slate-400 leading-tight"><b>Winner Take All:</b> One champion takes the entire pot. Must be paid to the commissioner before kickoff.</p>
+                    <p class="text-xs text-slate-400 leading-tight"><b>Winner Take All:</b> One champion takes the entire pot. Must be paid to the commissioner before Saturday kickoff.</p>
                 </div>
                 <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-[11px]">
-                    <h4 class="text-blue-400 font-black uppercase tracking-widest mb-3 italic">How Points are Tallied</h4>
-                    <p class="text-slate-400 mb-3">Points are <b>cumulative</b> for every correct selection you make.</p>
+                    <h4 class="text-blue-400 font-black uppercase tracking-widest mb-3 italic">Scoring Structure</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Wild Card Round</span><span class="text-blue-400 font-black">5 PTS</span></div>
                         <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Divisional Round</span><span class="text-blue-400 font-black">10 PTS</span></div>
@@ -47,6 +46,7 @@
         <header class="text-center py-12">
             <h1 class="text-6xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-yellow-400 uppercase">ROAD TO SB LX</h1>
             <div id="user-display" class="hidden text-slate-500 font-bold uppercase text-[10px] mt-2 italic tracking-widest"></div>
+            <button id="logout-btn" onclick="handleLogout()" class="hidden text-red-500 text-[10px] font-black uppercase hover:underline mt-2">Sign Out</button>
         </header>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12 text-center">
@@ -60,16 +60,16 @@
         <div id="main-content" class="hidden space-y-16">
             <div id="bracket-render" class="grid grid-cols-1 lg:grid-cols-2 gap-10"></div>
             <div class="text-center pt-16 border-t border-slate-900">
-                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-20 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter">Lock In My Picks</button>
+                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-20 py-6 rounded-full font-black text-2xl shadow-2xl transform hover:scale-105 transition-all text-white italic uppercase tracking-tighter">Lock In My Picks</button>
             </div>
         </div>
 
         <div id="leaderboard-section" class="mt-24 max-w-5xl mx-auto">
-            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-600 uppercase tracking-tighter">Live Standings</h2>
+            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-600 uppercase tracking-tighter">Live Rankings</h2>
             <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
-                <table class="w-full text-left text-center">
+                <table class="w-full text-left">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
-                        <tr><th class="p-6 w-16">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6 text-left">SB Winner</th><th class="p-6">TB</th></tr>
+                        <tr><th class="p-6 w-16 text-center">Rank</th><th class="p-6">Predictor</th><th class="p-6 text-center">Score</th><th class="p-6">SB Winner</th><th class="p-6 text-center">TB</th></tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm"></tbody>
                 </table>
@@ -78,28 +78,28 @@
     </div>
 
 <script>
-// --- CONFIG & SUPABASE ---
+// --- REPLACE WITH YOUR ACTUAL DATA ---
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const realResults = {
-    afc: { wc: { "2v7": null, "3v6": null, "4v5": null }, div: { d0: null, d1: null }, conf: null },
-    nfc: { wc: { "2v7": null, "3v6": null, "4v5": null }, div: { d0: null, d1: null }, conf: null },
-    sb_winner: null
-};
-
+// --- 2026 OFFICIAL POSTSEASON SEEDING ---
 const teamData = {
     afc: { 1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 3: { name: "Jaguars", id: "jax" }, 4: { name: "Steelers", id: "pit" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" }, 7: { name: "Chargers", id: "lac" } },
     nfc: { 1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 3: { name: "Eagles", id: "phi" }, 4: { name: "Panthers", id: "car" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" }, 7: { name: "Packers", id: "gb" } }
 };
 
 let currentUser = null;
+let realResults = {
+    afc: { wc: { "2v7": null, "3v6": null, "4v5": null }, div: { d0: null, d1: null }, conf: null },
+    nfc: { wc: { "2v7": null, "3v6": null, "4v5": null }, div: { d0: null, d1: null }, conf: null },
+    sb_winner: null
+};
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
 
-// GOOGLE AUTH LOGIC
+// --- AUTH HANDLERS ---
 async function handleGoogleLogin() {
     const { error } = await _supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -108,33 +108,171 @@ async function handleGoogleLogin() {
     if (error) alert("Error: " + error.message);
 }
 
-// (Include the rest of the render, createRoundUI, calculatePoints, and saveBracket logic provided in previous steps)
-// Make sure to include the new Ranking logic for the standings.
-
-async function init() {
-    const { data: { session } } = await _supabase.auth.getSession();
-    if (session) {
-        currentUser = session.user;
-        const fullName = currentUser.user_metadata.full_name;
-        
-        const { data } = await _supabase.from('playoff_picks').select('*').eq('id', currentUser.id).single();
-        if (!data) {
-            await _supabase.from('playoff_picks').upsert({
-                id: currentUser.id, user_name: fullName, email: currentUser.email, picks: picks
-            });
-        } else {
-            picks = data.picks;
-        }
-
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('user-display').innerText = `Predicting as: ${fullName}`;
-        document.getElementById('user-display').classList.remove('hidden');
-    }
-    render();
-    loadLeaderboard();
+async function handleLogout() {
+    await _supabase.auth.signOut();
+    location.reload();
 }
 
+async function handleUserAuthenticated() {
+    const fullName = currentUser.user_metadata.full_name;
+    const { data, error } = await _supabase.from('playoff_picks').select('*').eq('id', currentUser.id).single();
+    
+    if (!data) {
+        await _supabase.from('playoff_picks').upsert({ id: currentUser.id, user_name: fullName, email: currentUser.email, picks: picks });
+    } else {
+        picks = data.picks;
+    }
+
+    document.getElementById('auth-section').classList.add('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    document.getElementById('user-display').innerText = `Logged in as: ${fullName}`;
+    document.getElementById('user-display').classList.remove('hidden');
+    document.getElementById('logout-btn').classList.remove('hidden');
+    render();
+}
+
+// --- CORE APP LOGIC ---
+function render() {
+    const container = document.getElementById('bracket-render');
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = "grid grid-cols-1 lg:grid-cols-2 gap-10";
+
+    ['afc', 'nfc'].forEach(conf => {
+        const col = document.createElement('div');
+        col.className = "space-y-8";
+        col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">${conf}</h2>`;
+
+        // Matchups for 2026 Wild Card Round
+        const wc = createRoundUI(conf, 'wc', "Wild Card Weekend", [[2,7], [3,6], [4,5]]);
+        col.appendChild(wc);
+
+        const wcW = Object.values(picks[conf].wc);
+        if(wcW.length === 3) {
+            const sorted = [1, ...wcW].sort((a,b) => a-b);
+            const div = createRoundUI(conf, 'div', "Divisional Round", [{h: sorted[0], a: sorted[3]}, {h: sorted[1], a: sorted[2]}]);
+            col.appendChild(div);
+        }
+
+        const divW = Object.values(picks[conf].div);
+        if(divW.length === 2) {
+            const cc = createRoundUI(conf, 'conf', "Conference Championship", [{h: divW[0], a: divW[1]}]);
+            col.appendChild(cc);
+        }
+        grid.appendChild(col);
+    });
+    container.appendChild(grid);
+    if(picks.afc.conf && picks.nfc.conf) renderSuperBowl(container);
+}
+
+function createRoundUI(conf, round, title, matchups) {
+    const sec = document.createElement('div');
+    sec.innerHTML = `<p class="text-[10px] font-black uppercase text-slate-600 mb-3 tracking-widest">${title}</p>`;
+    matchups.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-3 shadow-xl";
+        const hS = m.h || m[0], aS = m.a || m[1];
+        [hS, aS].forEach(seed => {
+            const team = teamData[conf][seed];
+            const mKey = round === 'wc' ? `${hS}v${aS}` : (round === 'div' ? `d${idx}` : 'champ');
+            const isSelected = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mKey] === seed;
+            const btn = document.createElement('button');
+            btn.className = `w-full p-5 flex items-center gap-4 hover:bg-slate-800 transition ${isSelected ? 'selected' : ''}`;
+            btn.innerHTML = `<img src="${getLogo(team.id)}" class="w-10 h-10 object-contain pointer-events-none"><span class="font-bold uppercase italic text-sm pointer-events-none">${team.name}</span>`;
+            btn.onclick = () => {
+                if(round === 'wc') { picks[conf].wc[mKey] = seed; picks[conf].div = {}; picks[conf].conf = null; }
+                else if(round === 'div') { picks[conf].div[mKey] = seed; picks[conf].conf = null; }
+                else picks[conf].conf = seed;
+                picks.sb_winner = null; render();
+            };
+            card.appendChild(btn);
+        });
+        sec.appendChild(card);
+    });
+    return sec;
+}
+
+function renderSuperBowl(c) {
+    const sbDiv = document.createElement('div');
+    sbDiv.className = "mt-20 p-12 bg-gradient-to-br from-slate-900 to-black rounded-[3rem] border-2 border-yellow-500/20 shadow-2xl max-w-3xl mx-auto text-center";
+    sbDiv.innerHTML = `<h2 class="text-5xl font-black italic mb-12 tracking-tighter text-yellow-500 uppercase text-center">Super Bowl LX</h2>`;
+    const flex = document.createElement('div');
+    flex.className = "flex flex-col md:flex-row justify-center items-center gap-12 mb-12";
+    [{c:'afc', s:picks.afc.conf}, {c:'nfc', s:picks.nfc.conf}].forEach(t => {
+        const team = teamData[t.c][t.s];
+        const win = picks.sb_winner === t.s;
+        const d = document.createElement('div');
+        d.className = `sb-btn cursor-pointer p-8 rounded-3xl border-2 transition ${win ? 'bg-blue-600 border-blue-400 selected scale-110 shadow-2xl' : 'bg-slate-800 border-transparent hover:border-slate-600'}`;
+        d.innerHTML = `<img src="${getLogo(team.id)}" class="w-32 h-32 mx-auto mb-4 pointer-events-none"><p class="font-black italic uppercase text-center pointer-events-none">${team.name}</p>`;
+        d.onclick = (e) => { e.stopPropagation(); picks.sb_winner = t.s; render(); };
+        flex.appendChild(d);
+    });
+    sbDiv.appendChild(flex);
+    const scoreUI = document.createElement('div');
+    scoreUI.className = "bg-black/50 p-8 rounded-3xl border border-slate-800";
+    scoreUI.innerHTML = `<p class="text-center text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mb-6 italic">Tiebreaker: Combined Total Score</p>
+        <div class="flex justify-center items-center gap-12 text-center">
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">AFC</label><input type="number" id="afc-score" value="${picks.sb_score.afc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+            <div class="text-2xl font-black italic text-slate-700">VS</div>
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">NFC</label><input type="number" id="nfc-score" value="${picks.sb_score.nfc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+        </div>`;
+    sbDiv.appendChild(scoreUI);
+    c.appendChild(sbDiv);
+    document.getElementById('afc-score').oninput = (e) => picks.sb_score.afc = e.target.value;
+    document.getElementById('nfc-score').oninput = (e) => picks.sb_score.nfc = e.target.value;
+}
+
+// --- DATABASE & SCORING ---
+async function saveBracket() {
+    const { error } = await _supabase.from('playoff_picks').upsert({ id: currentUser.id, user_name: currentUser.user_metadata.full_name, email: currentUser.email, picks: picks });
+    if (error) alert("Save Error: " + error.message);
+    else alert("Success! Your bracket is locked.");
+}
+
+function calculatePoints(uP) {
+    let pts = 0;
+    ['afc', 'nfc'].forEach(c => {
+        Object.keys(realResults[c].wc).forEach(k => { if(realResults[c].wc[k] && uP[c].wc[k] === realResults[c].wc[k]) pts += 5; });
+        Object.keys(realResults[c].div).forEach(k => { if(realResults[c].div[k] && uP[c].div[k] === realResults[c].div[k]) pts += 10; });
+        if(realResults[c].conf && uP[c].conf === realResults[c].conf) pts += 15;
+    });
+    if(realResults.sb_winner && uP.sb_winner === realResults.sb_winner) pts += 20;
+    return pts;
+}
+
+async function loadLeaderboard() {
+    const { data } = await _supabase.from('playoff_picks').select('*');
+    const { data: mRes } = await _supabase.from('master_results').select('data').single();
+    if(mRes) realResults = mRes.data;
+
+    const tbody = document.getElementById('leaderboard-body');
+    if(!data) return;
+    const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
+    tbody.innerHTML = '';
+    scored.forEach((e, idx) => {
+        const win = e.picks.sb_winner;
+        const team = teamData[win <= 7 ? 'afc' : 'nfc'][win];
+        const r = document.createElement('tr');
+        r.className = "hover:bg-slate-800 transition cursor-pointer text-center";
+        r.innerHTML = `<td class="p-6 font-black ${idx < 3 ? 'rank-' + (idx + 1) : 'text-slate-600'}">${idx === 0 ? '🏆' : '#' + (idx + 1)}</td>
+            <td class="p-6 font-bold uppercase text-[11px] text-white tracking-widest text-left">${e.user_name}</td>
+            <td class="p-6 text-center text-blue-400 font-black text-xl">${e.pts}</td>
+            <td class="p-6 flex items-center gap-3 italic uppercase font-black text-xs text-slate-300 text-left"><img src="${getLogo(team?.id || 'nfl')}" class="w-6 h-6">${team?.name || 'TBD'}</td>
+            <td class="p-6 text-center text-emerald-400 font-bold font-mono">${e.picks.sb_score.afc}-${e.picks.sb_score.nfc}</td>`;
+        tbody.appendChild(r);
+    });
+}
+
+// --- INIT ---
+async function init() {
+    _supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+            currentUser = session.user;
+            await handleUserAuthenticated();
+        }
+    });
+    loadLeaderboard();
+}
 init();
 </script>
 </body>
