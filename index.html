@@ -174,22 +174,38 @@ function render() {
 function createRoundUI(conf, round, title, matchups) {
     const sec = document.createElement('div');
     sec.innerHTML = `<p class="text-[10px] font-black uppercase text-slate-600 mb-4 tracking-widest text-center lg:text-left">${title}</p>`;
+    
     matchups.forEach((m, idx) => {
         const card = document.createElement('div');
         card.className = "connector-line bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-4 shadow-xl";
+        
         const hS = m.h || m[0], aS = m.a || m[1];
         const mKey = round === 'wc' ? `${m[0]}v${m[1]}` : (round === 'div' ? `d${idx}` : 'champ');
-        
+
         [hS, aS].forEach(seed => {
             const team = teamData[conf][seed];
             const officialWinner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
+            
+            // PULL SCORE FROM DATABASE
+            const gameScores = realResults.scores?.[conf]?.[round]?.[mKey] || {};
+            const teamScore = gameScores[seed] !== undefined ? gameScores[seed] : "";
+
             let statusClass = "";
             if (officialWinner) statusClass = (String(officialWinner) === String(seed)) ? "official-winner" : "official-loser";
             const isSelected = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mKey] === seed;
             
             const btn = document.createElement('button');
-            btn.className = `w-full p-4 flex items-center gap-4 transition ${statusClass} ${isSelected && !statusClass ? 'selected' : 'hover:bg-slate-800'}`;
-            btn.innerHTML = `<span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span><img src="${getLogo(team.id)}" class="w-8 h-8"><span class="font-bold uppercase italic text-xs">${team.name}</span>`;
+            btn.className = `w-full p-4 flex items-center justify-between transition ${statusClass} ${isSelected && !statusClass ? 'selected' : 'hover:bg-slate-800'}`;
+            
+            btn.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span>
+                    <img src="${getLogo(team.id)}" class="w-8 h-8">
+                    <span class="font-bold uppercase italic text-xs">${team.name}</span>
+                </div>
+                <span class="font-mono font-black text-sm pr-2">${teamScore}</span>
+            `;
+            
             btn.onclick = () => {
                 if (officialWinner) return;
                 if(round === 'wc') { picks[conf].wc[mKey] = seed; picks[conf].div = {}; picks[conf].conf = null; }
@@ -203,7 +219,6 @@ function createRoundUI(conf, round, title, matchups) {
     });
     return sec;
 }
-
 function renderSuperBowl(c) {
     const officialSBWinner = realResults.sb_winner;
     c.innerHTML = `<h2 class="text-4xl font-black italic mb-8 text-yellow-500 uppercase">Super Bowl LX</h2>`;
