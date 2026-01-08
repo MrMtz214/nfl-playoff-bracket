@@ -10,8 +10,6 @@
         .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
         .locked-round { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
         .glass { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .sb-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .rank-1 { color: #fbbf24; font-size: 1.25rem; font-weight: 900; }
         .rank-2 { color: #94a3b8; font-weight: 700; }
         .rank-3 { color: #b45309; font-weight: 700; }
@@ -21,35 +19,27 @@
 
     <div id="rules-overlay" class="fixed inset-0 z-[100] glass flex items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-lg rounded-3xl border border-blue-500/30 p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-3xl font-black italic text-blue-400 mb-2 text-center uppercase">Pool Rules & Scoring</h2>
-            <p class="text-slate-500 text-[10px] font-black tracking-widest uppercase mb-6 text-center underline decoration-blue-500/30">Read before entering</p>
-            
-            <div class="space-y-6 mb-8">
+            <h2 class="text-3xl font-black italic text-blue-400 mb-2 text-center uppercase text-center">Pool Rules & Scoring</h2>
+            <div class="space-y-6 mb-8 mt-6">
                 <div class="flex items-center gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
                     <div class="text-center">
-                        <span class="block text-[10px] font-black text-slate-500 uppercase tracking-tighter">Entry Fee</span>
+                        <span class="block text-[10px] font-black text-slate-500 uppercase">Entry Fee</span>
                         <span class="text-3xl italic font-black text-emerald-400">$25</span>
                     </div>
                     <div class="h-10 w-px bg-slate-800"></div>
-                    <p class="text-xs text-slate-400 leading-tight">
-                        <b class="text-white uppercase">Winner Take All:</b> One champion takes the entire pot. Paid to the commissioner before kickoff.
-                    </p>
+                    <p class="text-xs text-slate-400 leading-tight">Winner takes the entire pot. Paid to the commissioner before kickoff.</p>
                 </div>
-
                 <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-[11px]">
-                    <h4 class="text-blue-400 font-black uppercase tracking-widest mb-3 italic underline decoration-blue-500/20">Point Tally Explanation</h4>
-                    <p class="text-slate-400 leading-relaxed mb-4">Points are <b>cumulative</b>. Every correct win adds to your total.</p>
+                    <h4 class="text-blue-400 font-black uppercase tracking-widest mb-3 italic">Point Tally</h4>
                     <div class="space-y-2">
-                        <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Wild Card Round</span><span class="text-blue-400 font-black">5 PTS</span></div>
-                        <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Divisional Round</span><span class="text-blue-400 font-black">10 PTS</span></div>
-                        <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Conf. Champ</span><span class="text-blue-400 font-black">15 PTS</span></div>
+                        <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Wild Card</span><span class="text-blue-400 font-black">5 PTS</span></div>
+                        <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Divisional</span><span class="text-blue-400 font-black">10 PTS</span></div>
+                        <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Championship</span><span class="text-blue-400 font-black">15 PTS</span></div>
                         <div class="flex justify-between bg-slate-900 px-3 py-2 rounded-lg border border-slate-800"><span>Super Bowl Winner</span><span class="text-blue-400 font-black">20 PTS</span></div>
                     </div>
                 </div>
-                <p class="text-[10px] text-slate-500 italic text-center">Tiebreaker: Closest total Super Bowl score wins.</p>
             </div>
-
-            <button onclick="acceptRules()" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all">I Understand & Accept</button>
+            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all">Accept & Continue</button>
         </div>
     </div>
 
@@ -60,22 +50,32 @@
         </header>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12">
-            <h2 class="text-center text-sm font-bold mb-6 italic text-slate-400 uppercase tracking-widest underline decoration-blue-500/50">Predictor Sign-In</h2>
-            <div class="space-y-4 text-center">
-                <input type="text" id="userName" placeholder="Your Name" class="w-full p-4 rounded-xl bg-black border border-slate-700 outline-none focus:border-blue-500 transition-all text-white text-center font-bold">
-                <button onclick="handleAnonymousLogin()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Go to Bracket</button>
+            <div id="phone-step-1">
+                <h2 class="text-center text-sm font-bold mb-6 italic text-slate-400 uppercase tracking-widest underline decoration-blue-500/50">Predictor Sign-In</h2>
+                <div class="space-y-4">
+                    <input type="text" id="userName" placeholder="Your Full Name" class="w-full p-4 rounded-xl bg-black border border-slate-700 outline-none text-white font-bold text-center">
+                    <input type="tel" id="userPhone" placeholder="+1 (555) 000-0000" class="w-full p-4 rounded-xl bg-black border border-slate-700 outline-none text-white font-bold text-center">
+                    <button onclick="handlePhoneLogin()" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg">Verify Number</button>
+                </div>
+            </div>
+            <div id="phone-step-2" class="hidden">
+                <h2 class="text-center text-sm font-bold mb-6 text-slate-400 uppercase tracking-widest">Enter 6-Digit Code</h2>
+                <div class="space-y-4">
+                    <input type="text" id="verifyCode" placeholder="000000" class="w-full p-4 rounded-xl bg-black border border-slate-700 outline-none text-white text-center font-black text-2xl tracking-[0.5em]">
+                    <button onclick="handleVerifyCode()" class="w-full bg-emerald-600 p-4 rounded-xl font-black uppercase tracking-widest">Verify & Play</button>
+                </div>
             </div>
         </div>
 
         <div id="main-content" class="hidden space-y-16">
             <div id="bracket-render" class="grid grid-cols-1 gap-12"></div>
             <div class="text-center pt-16 border-t border-slate-900">
-                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-20 py-6 rounded-full font-black text-2xl shadow-2xl transform hover:scale-105 transition-all text-white italic uppercase tracking-tighter">Lock In My Picks</button>
+                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-20 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter">Lock In My Picks</button>
             </div>
         </div>
 
         <div id="leaderboard-section" class="mt-24 max-w-5xl mx-auto">
-            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-600 uppercase tracking-tighter">Live Rankings</h2>
+            <h2 class="text-3xl font-black italic text-center mb-8 text-slate-600 uppercase tracking-tighter">Live Standings</h2>
             <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
                 <table class="w-full text-left">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
@@ -87,7 +87,7 @@
                             <th class="p-6 text-center">TB</th>
                         </tr>
                     </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm text-center"></tbody>
+                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm"></tbody>
                 </table>
             </div>
         </div>
@@ -113,35 +113,43 @@ const teamData = {
 let currentUser = null;
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
-function acceptRules() { document.getElementById('rules-overlay').classList.add('hidden'); }
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
 
-// ANONYMOUS LOGIN
-async function handleAnonymousLogin() {
-    const name = document.getElementById('userName').value;
-    if (!name) return alert("Please enter your name to join.");
+// --- PHONE AUTH LOGIC ---
+async function handlePhoneLogin() {
+    const phone = document.getElementById('userPhone').value;
+    if (!phone.startsWith('+')) return alert("Phone must include '+' and country code (e.g. +1)");
+    
+    const { error } = await _supabase.auth.signInWithOtp({ phone });
+    if (error) alert("Error: " + error.message);
+    else {
+        document.getElementById('phone-step-1').classList.add('hidden');
+        document.getElementById('phone-step-2').classList.remove('hidden');
+    }
+}
 
-    const { data, error } = await _supabase.auth.signInAnonymously();
-    if (error) return alert(error.message);
+async function handleVerifyCode() {
+    const phone = document.getElementById('userPhone').value;
+    const token = document.getElementById('verifyCode').value;
+    const name = document.getElementById('userName').value;
+
+    const { data, error } = await _supabase.auth.verifyOtp({ phone, token, type: 'sms' });
+    if (error) return alert("Invalid Code: " + error.message);
 
     currentUser = data.user;
     
-    // Create their record using their Name
+    // Save their profile name
     await _supabase.from('playoff_picks').upsert({
         id: currentUser.id,
-        user_name: name,
-        email: 'anonymous@pool.com', 
+        user_name: name || 'Predictor',
+        email: phone,
         picks: picks
     });
 
-    document.getElementById('auth-section').classList.add('hidden');
-    document.getElementById('main-content').classList.remove('hidden');
-    document.getElementById('user-display').innerText = `Predicting as: ${name}`;
-    document.getElementById('user-display').classList.remove('hidden');
-    render();
+    location.reload(); 
 }
 
-// SCORING
+// --- SCORING ---
 function calculatePoints(uP) {
     let pts = 0;
     ['afc', 'nfc'].forEach(c => {
@@ -153,7 +161,105 @@ function calculatePoints(uP) {
     return pts;
 }
 
-// [Include the render, createRoundUI, and saveBracket functions as before]
+// --- RENDERING ---
+function render() {
+    const container = document.getElementById('bracket-render');
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = "grid grid-cols-1 lg:grid-cols-2 gap-10";
+
+    ['afc', 'nfc'].forEach(conf => {
+        const col = document.createElement('div');
+        col.className = "space-y-8";
+        col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">${conf}</h2>`;
+
+        const wc = createRoundUI(conf, 'wc', "Wild Card Round", [[2,7], [3,6], [4,5]]);
+        col.appendChild(wc);
+
+        const wcW = Object.values(picks[conf].wc);
+        if(wcW.length === 3) {
+            const sorted = [1, ...wcW].sort((a,b) => a-b);
+            const div = createRoundUI(conf, 'div', "Divisional Round", [{h: sorted[0], a: sorted[3]}, {h: sorted[1], a: sorted[2]}]);
+            col.appendChild(div);
+        }
+
+        const divW = Object.values(picks[conf].div);
+        if(divW.length === 2) {
+            const cc = createRoundUI(conf, 'conf', "Conference Championship", [{h: divW[0], a: divW[1]}]);
+            col.appendChild(cc);
+        }
+        grid.appendChild(col);
+    });
+    container.appendChild(grid);
+    if(picks.afc.conf && picks.nfc.conf) renderSuperBowl(container);
+}
+
+function createRoundUI(conf, round, title, matchups) {
+    const sec = document.createElement('div');
+    sec.innerHTML = `<p class="text-[10px] font-black uppercase text-slate-600 mb-3 tracking-widest">${title}</p>`;
+    matchups.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-3 shadow-xl";
+        const hS = m.h || m[0], aS = m.a || m[1];
+        [hS, aS].forEach(seed => {
+            const team = teamData[conf][seed];
+            const mKey = round === 'wc' ? `${hS}v${aS}` : (round === 'div' ? `d${idx}` : 'champ');
+            const isSelected = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mKey] === seed;
+            const btn = document.createElement('button');
+            btn.className = `w-full p-5 flex items-center gap-4 hover:bg-slate-800 transition ${isSelected ? 'selected' : ''}`;
+            btn.innerHTML = `<img src="${getLogo(team.id)}" class="w-10 h-10 object-contain pointer-events-none"><span class="font-bold uppercase italic text-sm pointer-events-none">${team.name}</span>`;
+            btn.onclick = () => {
+                if(round === 'wc') { picks[conf].wc[mKey] = seed; picks[conf].div = {}; picks[conf].conf = null; }
+                else if(round === 'div') { picks[conf].div[mKey] = seed; picks[conf].conf = null; }
+                else picks[conf].conf = seed;
+                picks.sb_winner = null; render();
+            };
+            card.appendChild(btn);
+        });
+        sec.appendChild(card);
+    });
+    return sec;
+}
+
+function renderSuperBowl(c) {
+    const sbDiv = document.createElement('div');
+    sbDiv.className = "mt-20 p-12 bg-gradient-to-br from-slate-900 to-black rounded-[3rem] border-2 border-yellow-500/20 shadow-2xl max-w-3xl mx-auto text-center";
+    sbDiv.innerHTML = `<h2 class="text-5xl font-black italic mb-12 tracking-tighter text-yellow-500 uppercase">Super Bowl LX</h2>`;
+    const flex = document.createElement('div');
+    flex.className = "flex flex-col md:flex-row justify-center items-center gap-12 mb-12";
+    [{c:'afc', s:picks.afc.conf}, {c:'nfc', s:picks.nfc.conf}].forEach(t => {
+        const team = teamData[t.c][t.s];
+        const win = picks.sb_winner === t.s;
+        const d = document.createElement('div');
+        d.className = `cursor-pointer p-8 rounded-3xl border-2 transition ${win ? 'bg-blue-600 border-blue-400 selected scale-110 shadow-2xl' : 'bg-slate-800 border-transparent hover:border-slate-600'}`;
+        d.innerHTML = `<img src="${getLogo(team.id)}" class="w-32 h-32 mx-auto mb-4 pointer-events-none"><p class="font-black italic uppercase text-center pointer-events-none">${team.name}</p>`;
+        d.onclick = (e) => { e.stopPropagation(); picks.sb_winner = t.s; render(); };
+        flex.appendChild(d);
+    });
+    sbDiv.appendChild(flex);
+    const scoreUI = document.createElement('div');
+    scoreUI.className = "bg-black/50 p-8 rounded-3xl border border-slate-800";
+    scoreUI.innerHTML = `<p class="text-center text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mb-6 italic">Tiebreaker: Combined Total Score</p>
+        <div class="flex justify-center items-center gap-12 text-center">
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">AFC</label><input type="number" id="afc-score" value="${picks.sb_score.afc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+            <div class="text-2xl font-black italic text-slate-700">VS</div>
+            <div><label class="text-[10px] text-slate-500 font-bold block mb-2 uppercase">NFC</label><input type="number" id="nfc-score" value="${picks.sb_score.nfc}" class="w-24 p-4 text-4xl font-black bg-slate-900 border border-slate-800 rounded-2xl outline-none text-white text-center"></div>
+        </div>`;
+    sbDiv.appendChild(scoreUI);
+    c.appendChild(sbDiv);
+    document.getElementById('afc-score').oninput = (e) => picks.sb_score.afc = e.target.value;
+    document.getElementById('nfc-score').oninput = (e) => picks.sb_score.nfc = e.target.value;
+}
+
+// --- DATA SAVING & LEADERBOARD ---
+async function saveBracket() {
+    const { error } = await _supabase.from('playoff_picks').upsert({
+        id: currentUser.id, user_name: document.getElementById('userName').value || 'Predictor',
+        email: 'phone-auth', picks: picks
+    });
+    if (error) alert(error.message);
+    else alert("Success! Your bracket is locked and updated.");
+}
 
 async function loadLeaderboard() {
     const { data } = await _supabase.from('playoff_picks').select('*');
@@ -165,7 +271,7 @@ async function loadLeaderboard() {
         const win = e.picks.sb_winner;
         const team = teamData[win <= 7 ? 'afc' : 'nfc'][win];
         const r = document.createElement('tr');
-        r.className = "hover:bg-slate-800 transition cursor-pointer";
+        r.className = "hover:bg-slate-800 transition cursor-pointer text-center";
         r.innerHTML = `
             <td class="p-6 font-black ${idx < 3 ? 'rank-' + (idx + 1) : 'text-slate-600'}">${idx === 0 ? '🏆' : '#' + (idx + 1)}</td>
             <td class="p-6 font-bold uppercase text-[11px] text-white tracking-widest text-left">${e.user_name}</td>
@@ -176,7 +282,6 @@ async function loadLeaderboard() {
     });
 }
 
-// Final check for existing session
 async function init() {
     const { data: { session } } = await _supabase.auth.getSession();
     if (session) {
@@ -184,6 +289,7 @@ async function init() {
         const { data } = await _supabase.from('playoff_picks').select('*').eq('id', currentUser.id).single();
         if (data) {
             picks = data.picks;
+            document.getElementById('userName').value = data.user_name;
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
             document.getElementById('user-display').innerText = `Predicting as: ${data.user_name}`;
