@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL 2026 Playoff Pool | Strategist Scoring</title>
+    <title>ROAD TO SB LX | Winner Take All</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -27,49 +27,50 @@
 
     <div id="rules-overlay" class="fixed inset-0 z-[100] glass flex items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-lg rounded-3xl border border-blue-500/30 p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <h2 class="text-4xl font-black italic text-blue-400 mb-2 text-center uppercase tracking-tighter">ROAD TO SB LX</h2>
+            <div class="text-center mb-8">
+                <h2 class="text-5xl font-black italic text-blue-400 uppercase tracking-tighter">ROAD TO SB LX</h2>
+                <p class="text-[10px] font-black text-slate-500 tracking-[0.4em] uppercase mt-2">The 2026 Playoff Challenge</p>
+            </div>
             
-            <div class="space-y-6 mb-8 mt-6">
-                <div class="bg-blue-600/10 border-2 border-blue-500/30 p-6 rounded-2xl text-center">
-                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2 italic">Entry Fee: $25.00</p>
-                    <div onclick="copyZelleEmail()" class="cursor-pointer bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between mb-2 active:scale-95 transition-transform">
-                        <span id="zelle-email" class="text-xs font-black text-white italic">sergio.e.mtz@gmail.com</span>
-                        <span class="text-[9px] font-black text-blue-400 uppercase italic">Tap to Copy</span>
-                    </div>
-                    <p id="copy-toast" class="text-[9px] text-emerald-400 font-bold uppercase opacity-0 transition-opacity">Copied to Clipboard!</p>
-                </div>
-
-                <div class="bg-amber-500/10 border border-amber-500/40 p-5 rounded-2xl">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-amber-500 text-lg">⚠️</span>
-                        <h4 class="text-amber-500 font-black uppercase text-[11px] tracking-widest italic">Scoring Alert: Strategist Bonus</h4>
-                    </div>
-                    <p class="text-slate-300 text-[10px] leading-relaxed">
-                        This pool rewards <b>Upset Picks</b>. Every correct win earns you <b>Base Points + Team Seed</b>. 
-                    </p>
-                    <div class="mt-3 grid grid-cols-2 gap-2">
-                        <div class="bg-black/40 p-2 rounded-lg border border-amber-500/10">
-                            <p class="text-[8px] text-slate-500 uppercase font-bold text-center">Safe Pick (#2 Seed)</p>
-                            <p class="text-white font-black text-xs text-center">7 Points <span class="text-[9px] font-normal text-slate-400">(5+2)</span></p>
-                        </div>
-                        <div class="bg-amber-500/20 p-2 rounded-lg border border-amber-500/30 text-center">
-                            <p class="text-[8px] text-amber-500 uppercase font-bold">Upset Pick (#7 Seed)</p>
-                            <p class="text-white font-black text-xs">12 Points <span class="text-[9px] font-normal text-slate-400">(5+7)</span></p>
-                        </div>
+            <div class="space-y-6 mb-8">
+                <div class="bg-emerald-500/10 border-2 border-emerald-500/40 p-8 rounded-3xl text-center shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+                    <p class="text-[11px] font-black text-emerald-500 uppercase tracking-widest mb-3 italic">What's At Stake</p>
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter">Winner Take All</h3>
+                    <p class="text-emerald-400 font-bold text-sm mt-2">100% of the pot goes to 1st Place</p>
+                    <div class="mt-4 pt-4 border-t border-emerald-500/20">
+                        <p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Entry Fee: $25</p>
                     </div>
                 </div>
 
                 <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
-                    <h4 class="text-blue-400 font-black uppercase text-[11px] mb-4 text-center italic tracking-widest">Base Points Per Round</h4>
-                    <div class="grid grid-cols-2 gap-3 text-[10px] font-black uppercase text-center">
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">WildCard: 5pts</div>
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Divisional: 10pts</div>
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Conference: 15pts</div>
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Super-Bowl: 20pts</div>
+                    <h4 class="text-blue-400 font-black uppercase text-[11px] mb-4 text-center italic tracking-widest">The Path to Glory</h4>
+                    <p class="text-slate-400 text-[11px] mb-6 text-center leading-relaxed">
+                        Points stack for <b>every win</b>. Want the big lead? Pick the underdogs—their seed value is added to your round score!
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[9px] text-slate-500 uppercase font-black">Wild Card</p>
+                            <p class="text-white font-black">5 PTS + SEED</p>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[9px] text-slate-500 uppercase font-black">Divisional</p>
+                            <p class="text-white font-black">10 PTS + SEED</p>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[9px] text-slate-500 uppercase font-black">Conf Champ</p>
+                            <p class="text-white font-black">15 PTS + SEED</p>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[9px] text-slate-500 uppercase font-black">Super Bowl</p>
+                            <p class="text-white font-black">20 PTS + SEED</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Accept & Enter</button>
+            
+            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-[0_10px_20px_rgba(37,99,235,0.3)] active:scale-95">Enter the Arena</button>
         </div>
     </div>
 
@@ -82,11 +83,11 @@
         <div id="admin-panel" class="hidden relative z-[90] mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
             <h2 class="text-2xl font-black italic text-red-500 uppercase mb-4 tracking-tighter text-center">Commissioner Dashboard</h2>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest">Update Official Standings</button>
+            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all">Update Official Standings</button>
         </div>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center shadow-2xl mb-12">
-            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-4 w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200">Sign In With Google</button>
+            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-4 w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all">Sign In With Google</button>
         </div>
 
         <div id="main-content" class="hidden">
@@ -108,7 +109,6 @@
                         💰 Live Jackpot: <span id="jackpot-amount" class="text-white ml-1 font-mono">$0</span>
                     </p>
                 </div>
-                <p id="last-updated" class="text-[9px] text-slate-600 uppercase mt-4 font-bold tracking-widest italic text-center"></p>
             </div>
             <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
                 <table class="w-full text-center">
@@ -122,7 +122,7 @@
     </div>
 
 <script>
-// --- COMMISSIONER CONFIG ---
+// --- CONFIG & CREDENTIALS ---
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
 const COMMISSIONER_EMAIL = 'sergio.e.mtz@gmail.com'; 
@@ -149,15 +149,6 @@ async function handleGoogleLogin() {
     await _supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } });
 }
 
-function copyZelleEmail() {
-    const email = document.getElementById('zelle-email').innerText;
-    navigator.clipboard.writeText(email).then(() => {
-        const toast = document.getElementById('copy-toast');
-        toast.style.opacity = '1';
-        setTimeout(() => toast.style.opacity = '0', 2000);
-    });
-}
-
 async function init() {
     _supabase.auth.onAuthStateChange(async (event, session) => {
         if (session) {
@@ -167,20 +158,16 @@ async function init() {
             if (data) picks = data.picks;
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('user-display').innerText = `Welcome, ${currentUser.user_metadata.full_name}`;
+            document.getElementById('user-display').innerText = `Logged in: ${currentUser.user_metadata.full_name}`;
             document.getElementById('user-display').classList.remove('hidden');
             render();
         }
     });
     const { data: mRes } = await _supabase.from('master_results').select('*').single();
-    if(mRes) {
-        realResults = mRes.data;
-        if(mRes.updated_at) document.getElementById('last-updated').innerText = `Updated: ${new Date(mRes.updated_at).toLocaleString()}`;
-    }
+    if(mRes) realResults = mRes.data;
     loadLeaderboard();
 }
 
-// --- RENDER LOGIC ---
 function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
@@ -254,7 +241,7 @@ function renderSuperBowl(c) {
     c.appendChild(flex);
     const scoreUI = document.createElement('div');
     scoreUI.className = "bg-black/50 p-6 rounded-3xl border border-slate-800 text-center w-full";
-    scoreUI.innerHTML = `<p class="text-[10px] font-black text-yellow-500 mb-4 italic uppercase">TB Total Score</p>
+    scoreUI.innerHTML = `<p class="text-[10px] font-black text-yellow-500 mb-4 italic uppercase tracking-widest">Tiebreaker Score</p>
         <div class="flex justify-center items-center gap-4"><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score.afc}" class="w-16 p-2 bg-slate-900 rounded text-center"><span class="font-black text-slate-600">VS</span><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score.nfc}" class="w-16 p-2 bg-slate-900 rounded text-center"></div>`;
     c.appendChild(scoreUI);
 }
@@ -264,17 +251,17 @@ async function renderAdminControls() {
     const ctrl = document.getElementById('admin-controls');
     ctrl.innerHTML = '';
     
-    // Payment Tracker Section
+    // Roster Section
     const rosterSec = document.createElement('div');
     rosterSec.className = "col-span-full bg-slate-950 p-6 rounded-2xl border border-slate-800 mb-8";
-    rosterSec.innerHTML = `<h3 class="text-emerald-400 font-black uppercase text-[10px] mb-4 tracking-widest italic">Entry & Payment Tracker</h3>`;
+    rosterSec.innerHTML = `<h3 class="text-emerald-400 font-black uppercase text-[10px] mb-4 tracking-widest italic">Entry Tracker</h3>`;
     const { data: users } = await _supabase.from('playoff_picks').select('id, user_name, is_paid');
     if(users) {
         users.forEach(u => {
             const row = document.createElement('div');
             row.className = "flex items-center justify-between p-3 border-b border-slate-900 last:border-0";
             row.innerHTML = `<span class="text-xs font-bold text-slate-300">${u.user_name}</span>
-            <button onclick="togglePaid('${u.id}', ${u.is_paid})" class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${u.is_paid ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500 hover:bg-red-500/20'}">${u.is_paid ? '✅ Paid' : '❌ Unpaid'}</button>`;
+            <button onclick="togglePaid('${u.id}', ${u.is_paid})" class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${u.is_paid ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-500'}">${u.is_paid ? '✅ Paid' : '❌ Unpaid'}</button>`;
             rosterSec.appendChild(row);
         });
     }
@@ -317,7 +304,7 @@ async function togglePaid(userId, currentStatus) {
 
 async function saveAdminScores() {
     await _supabase.from('master_results').upsert({ id: 1, data: realResults, updated_at: new Date().toISOString() });
-    alert("Standings Updated!"); location.reload();
+    alert("Official Standings Updated!"); location.reload();
 }
 
 async function saveBracket() {
@@ -338,7 +325,7 @@ async function loadLeaderboard() {
             <td class="p-6 text-left">
                 <div class="flex items-center gap-2">
                     <span class="font-bold uppercase text-[11px] text-white tracking-widest">${e.user_name}</span>
-                    ${e.is_paid ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black">PAID</span>' : ''}
+                    ${e.is_paid ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black tracking-widest">PAID</span>' : ''}
                 </div>
             </td>
             <td class="p-6 text-blue-400 font-black text-xl">${e.pts}</td>
