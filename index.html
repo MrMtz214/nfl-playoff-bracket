@@ -10,11 +10,8 @@
         .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
         .glass { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); }
         .rank-1 { color: #fbbf24; font-size: 1.25rem; font-weight: 900; }
-        
-        /* New Live Result Styling */
-        .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); pointer-events: none; }
-        .official-loser { opacity: 0.25; filter: grayscale(1); pointer-events: none; cursor: not-allowed; }
-
+        .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        .official-loser { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
         @media (min-width: 1024px) {
             .connector-line { position: relative; }
             .connector-line::after {
@@ -31,30 +28,25 @@
     <div id="rules-overlay" class="fixed inset-0 z-[100] glass flex items-center justify-center p-4">
         <div class="bg-slate-900 w-full max-w-lg rounded-3xl border border-blue-500/30 p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
             <h2 class="text-4xl font-black italic text-blue-400 mb-2 text-center uppercase tracking-tighter">ROAD TO SB LX</h2>
-            <div class="space-y-6 mb-8 mt-6">
-                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center">
-                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2">The Stakes</p>
-                    <div class="flex justify-center items-baseline gap-2">
-                        <span class="text-4xl font-black text-white italic">$25</span>
-                        <span class="text-emerald-400 font-bold uppercase text-xs">Entry Fee</span>
-                    </div>
-                    <p class="text-emerald-400 font-black uppercase text-[11px] mt-3 tracking-tighter italic">🏆 Winner Take All: Total Pot to 1st Place</p>
-                </div>
-
+            <div class="space-y-6 mb-8 mt-6 text-center">
                 <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
-                    <h4 class="text-blue-400 font-black uppercase text-[11px] mb-4 italic underline decoration-blue-500/20">Point Tally (Cumulative)</h4>
-                    <p class="text-slate-400 text-[11px] mb-4 leading-relaxed italic">
-                        Points stack for <b>every win</b> your team picks up. If they go on a deep run, you rack up points at every round!
-                    </p>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2">The Stakes</p>
+                    <span class="text-4xl font-black text-white italic">$25</span>
+                    <p class="text-emerald-400 font-black uppercase text-[11px] mt-3 tracking-tighter italic">🏆 Winner Take All</p>
+                </div>
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-left">
+                    <h4 class="text-blue-400 font-black uppercase text-[11px] mb-4 italic underline decoration-blue-500/20 text-center">Cumulative Momentum Scoring</h4>
+                    <p class="text-slate-400 text-[11px] mb-4 leading-relaxed text-center">Points stack for <b>every win</b>. If your team goes on a deep run, you earn points at every round!</p>
                     <div class="grid grid-cols-2 gap-3 text-[10px] font-black uppercase text-center">
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Wild Card: 5pts</div>
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Divisional: 10pts</div>
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Conf Champ: 15pts</div>
-                        <div class="bg-slate-900 p-2 rounded border border-slate-800">Super Bowl: 20pts</div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">WC: 5pts</div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">DIV: 10pts</div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">CONF: 15pts</div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">SB: 20pts</div>
                     </div>
                 </div>
+                <p class="text-[10px] text-slate-500 italic">Tiebreaker: Closest to total Super Bowl combined score wins.</p>
             </div>
-            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Accept & Enter Pool</button>
+            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Accept & Enter</button>
         </div>
     </div>
 
@@ -65,9 +57,9 @@
         </header>
 
         <div id="admin-panel" class="hidden relative z-[90] mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
-            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-4 tracking-tighter">Commissioner Scoreboard</h2>
+            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-4 tracking-tighter">Commissioner Scoreboard & Live Scores</h2>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 bg-red-600 hover:bg-red-500 text-white px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest">Update Official Standings</button>
+            <button onclick="saveAdminScores()" class="mt-8 bg-red-600 hover:bg-red-500 text-white px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all">Update Official Scores</button>
         </div>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center shadow-2xl mb-12">
@@ -84,7 +76,7 @@
                 <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
             </div>
             <div class="text-center pt-20 mt-20 border-t border-slate-900">
-                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter transition-all active:scale-95">Lock In My Picks</button>
+                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter">Lock In My Picks</button>
             </div>
         </div>
 
@@ -110,6 +102,7 @@
     </div>
 
 <script>
+// --- COMMISSIONER CONFIG ---
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
 const COMMISSIONER_EMAIL = 'sergio.e.mtz@gmail.com'; 
@@ -121,7 +114,12 @@ const teamData = {
 };
 
 let currentUser = null;
-let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null };
+let realResults = { 
+    afc: { wc: {}, div: {}, conf: null }, 
+    nfc: { wc: {}, div: {}, conf: null }, 
+    sb_winner: null,
+    scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } }
+};
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
@@ -148,12 +146,12 @@ async function init() {
     const { data: mRes } = await _supabase.from('master_results').select('*').single();
     if(mRes) {
         realResults = mRes.data;
-        if(mRes.updated_at) document.getElementById('last-updated').innerText = `Updated: ${new Date(mRes.updated_at).toLocaleString()}`;
+        if(mRes.updated_at) document.getElementById('last-updated').innerText = `Scores Updated: ${new Date(mRes.updated_at).toLocaleString()}`;
     }
     loadLeaderboard();
 }
 
-// --- RENDERING WITH DYNAMIC HIGHLIGHTS ---
+// --- RENDER LOGIC ---
 function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
@@ -164,7 +162,7 @@ function render() {
             const sorted = [1, ...wcW].sort((a,b) => a-b);
             col.appendChild(createRoundUI(conf, 'div', "Divisional Round", [{h: sorted[0], a: sorted[3]}, {h: sorted[1], a: sorted[2]}]));
             const divW = Object.values(picks[conf].div);
-            if(divW.length === 2) col.appendChild(createRoundUI(conf, 'conf', "Championship", [{h: divW[0], a: divW[1]}]));
+            if(divW.length === 2) col.appendChild(createRoundUI(conf, 'conf', "Conference Championship", [{h: divW[0], a: divW[1]}]));
         }
     });
     if(picks.afc.conf && picks.nfc.conf) renderSuperBowl(document.getElementById('sb-column'));
@@ -174,19 +172,15 @@ function render() {
 function createRoundUI(conf, round, title, matchups) {
     const sec = document.createElement('div');
     sec.innerHTML = `<p class="text-[10px] font-black uppercase text-slate-600 mb-4 tracking-widest text-center lg:text-left">${title}</p>`;
-    
     matchups.forEach((m, idx) => {
         const card = document.createElement('div');
         card.className = "connector-line bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-4 shadow-xl";
-        
         const hS = m.h || m[0], aS = m.a || m[1];
         const mKey = round === 'wc' ? `${m[0]}v${m[1]}` : (round === 'div' ? `d${idx}` : 'champ');
-
+        
         [hS, aS].forEach(seed => {
             const team = teamData[conf][seed];
             const officialWinner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
-            
-            // PULL SCORE FROM DATABASE
             const gameScores = realResults.scores?.[conf]?.[round]?.[mKey] || {};
             const teamScore = gameScores[seed] !== undefined ? gameScores[seed] : "";
 
@@ -196,15 +190,13 @@ function createRoundUI(conf, round, title, matchups) {
             
             const btn = document.createElement('button');
             btn.className = `w-full p-4 flex items-center justify-between transition ${statusClass} ${isSelected && !statusClass ? 'selected' : 'hover:bg-slate-800'}`;
-            
             btn.innerHTML = `
                 <div class="flex items-center gap-4">
                     <span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span>
                     <img src="${getLogo(team.id)}" class="w-8 h-8">
                     <span class="font-bold uppercase italic text-xs">${team.name}</span>
                 </div>
-                <span class="font-mono font-black text-sm pr-2">${teamScore}</span>
-            `;
+                <span class="font-mono font-black text-sm pr-2">${teamScore}</span>`;
             
             btn.onclick = () => {
                 if (officialWinner) return;
@@ -219,6 +211,7 @@ function createRoundUI(conf, round, title, matchups) {
     });
     return sec;
 }
+
 function renderSuperBowl(c) {
     const officialSBWinner = realResults.sb_winner;
     c.innerHTML = `<h2 class="text-4xl font-black italic mb-8 text-yellow-500 uppercase">Super Bowl LX</h2>`;
@@ -227,10 +220,10 @@ function renderSuperBowl(c) {
     [{c:'afc', s:picks.afc.conf}, {c:'nfc', s:picks.nfc.conf}].forEach(t => {
         const team = teamData[t.c][t.s];
         const win = picks.sb_winner === t.s;
-        let statusClass = "";
-        if (officialSBWinner) statusClass = (String(officialSBWinner) === String(t.s)) ? "official-winner" : "official-loser";
+        let sc = "";
+        if (officialSBWinner) sc = (String(officialSBWinner) === String(t.s)) ? "official-winner" : "official-loser";
         const d = document.createElement('div');
-        d.className = `cursor-pointer p-6 rounded-3xl border-2 transition ${statusClass} ${win && !statusClass ? 'selected scale-110 shadow-2xl' : 'bg-slate-800 border-transparent'}`;
+        d.className = `cursor-pointer p-6 rounded-3xl border-2 transition ${sc} ${win && !sc ? 'selected scale-110' : 'bg-slate-800 border-transparent'}`;
         d.innerHTML = `<img src="${getLogo(team.id)}" class="w-24 h-24 mb-2"><p class="font-black italic uppercase text-[10px] text-center">${team.name}</p>`;
         d.onclick = () => { if(!officialSBWinner) { picks.sb_winner = t.s; render(); } };
         flex.appendChild(d);
@@ -238,47 +231,54 @@ function renderSuperBowl(c) {
     c.appendChild(flex);
     const scoreUI = document.createElement('div');
     scoreUI.className = "bg-black/50 p-6 rounded-3xl border border-slate-800 text-center w-full";
-    scoreUI.innerHTML = `<p class="text-[10px] font-black text-yellow-500 mb-4 italic">Combined Score Tiebreaker</p>
-        <div class="flex justify-center items-center gap-4"><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score.afc}" class="w-16 p-2 bg-slate-900 rounded text-center text-white outline-none">
-        <span class="font-black text-slate-600">VS</span><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score.nfc}" class="w-16 p-2 bg-slate-900 rounded text-center text-white outline-none"></div>`;
+    scoreUI.innerHTML = `<p class="text-[10px] font-black text-yellow-500 mb-4 italic tracking-widest uppercase">Tiebreaker Score</p>
+        <div class="flex justify-center items-center gap-4"><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score.afc}" class="w-16 p-2 bg-slate-900 rounded text-center">
+        <span class="font-black text-slate-600">VS</span><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score.nfc}" class="w-16 p-2 bg-slate-900 rounded text-center"></div>`;
     c.appendChild(scoreUI);
 }
 
-// --- ADMIN CONTROLS ---
+// --- ADMIN CONTROL ---
 function renderAdminControls() {
     const ctrl = document.getElementById('admin-controls');
     ctrl.innerHTML = '';
+    if (!realResults.scores) realResults.scores = { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } };
+
     ['afc','nfc'].forEach(conf => {
         const sec = document.createElement('div');
-        sec.innerHTML = `<h3 class="uppercase font-black text-xs text-slate-500 mb-4">${conf} Results</h3>`;
-        const addS = (lbl, cur, cb) => {
-            const d = document.createElement('div'); d.className = "mb-4";
-            d.innerHTML = `<label class="block text-[10px] mb-1 font-bold">${lbl}</label>`;
-            const s = document.createElement('select'); s.className = "bg-black border border-slate-800 p-2 w-full text-xs rounded text-white";
-            s.innerHTML = `<option value="">Select Winner</option>` + Object.keys(teamData[conf]).map(seed => `<option value="${seed}" ${cur == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
-            s.onchange = (e) => cb(e.target.value);
-            d.appendChild(s); sec.appendChild(d);
+        sec.innerHTML = `<h3 class="uppercase font-black text-xs text-slate-500 mb-6 border-b border-slate-800 pb-2">${conf} Score Entry</h3>`;
+        
+        const addGame = (lbl, round, mKey) => {
+            const winner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
+            const d = document.createElement('div'); d.className = "mb-6 p-4 bg-black/40 rounded-xl border border-slate-800";
+            d.innerHTML = `<label class="block text-[10px] mb-2 font-bold text-slate-400 uppercase">${lbl}</label>`;
+            
+            const s = document.createElement('select'); s.className = "bg-slate-900 border border-slate-700 p-2 w-full text-xs rounded text-white mb-3";
+            s.innerHTML = `<option value="">Winner</option>` + Object.keys(teamData[conf]).map(seed => `<option value="${seed}" ${winner == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
+            s.onchange = (e) => { if(round === 'conf') realResults[conf].conf = e.target.value; else realResults[conf][round][mKey] = e.target.value; };
+            d.appendChild(s);
+
+            const sFlex = document.createElement('div'); sFlex.className = "flex gap-2";
+            const seeds = mKey === 'champ' ? [realResults[conf].div.d0, realResults[conf].div.d1] : mKey.split('v');
+            seeds.forEach(seed => {
+                if(!seed) return;
+                const inp = document.createElement('input'); inp.type = "number"; inp.placeholder = `${teamData[conf][seed].name}`;
+                inp.className = "w-1/2 bg-slate-800 border border-slate-700 p-2 text-[10px] rounded";
+                inp.value = realResults.scores[conf][round][mKey]?.[seed] || "";
+                inp.oninput = (e) => { if (!realResults.scores[conf][round][mKey]) realResults.scores[conf][round][mKey] = {}; realResults.scores[conf][round][mKey][seed] = e.target.value; };
+                sFlex.appendChild(inp);
+            });
+            d.appendChild(sFlex); sec.appendChild(d);
         };
-        addS("WC #2v7", realResults[conf].wc["2v7"], (v)=>realResults[conf].wc["2v7"]=v);
-        addS("WC #3v6", realResults[conf].wc["3v6"], (v)=>realResults[conf].wc["3v6"]=v);
-        addS("WC #4v5", realResults[conf].wc["4v5"], (v)=>realResults[conf].wc["4v5"]=v);
-        addS("DIV Game 1", realResults[conf].div["d0"], (v)=>realResults[conf].div["d0"]=v);
-        addS("DIV Game 2", realResults[conf].div["d1"], (v)=>realResults[conf].div["d1"]=v);
-        addS("Conference Winner", realResults[conf].conf, (v)=>realResults[conf].conf=v);
+        addGame("Wild Card #2v7", "wc", "2v7");
+        addGame("Wild Card #3v6", "wc", "3v6");
+        addGame("Wild Card #4v5", "wc", "4v5");
         ctrl.appendChild(sec);
     });
-    const sbSec = document.createElement('div');
-    sbSec.innerHTML = `<h3 class="uppercase font-black text-xs text-slate-500 mb-4">Official Super Bowl</h3>`;
-    const sbS = document.createElement('select'); sbS.className = "bg-black border border-slate-800 p-2 w-full text-xs rounded text-white";
-    let opts = '<option value="">Champion</option>';
-    ['afc','nfc'].forEach(c => Object.keys(teamData[c]).forEach(s => opts += `<option value="${s}" ${realResults.sb_winner == s ? 'selected' : ''}>${c.toUpperCase()}: ${teamData[c][s].name}</option>`));
-    sbS.innerHTML = opts; sbS.onchange = (e) => realResults.sb_winner = e.target.value;
-    sbSec.appendChild(sbS); ctrl.appendChild(sbSec);
 }
 
 async function saveAdminScores() {
     const { error } = await _supabase.from('master_results').upsert({ id: 1, data: realResults, updated_at: new Date().toISOString() });
-    if(error) alert(error.message); else { alert("Standings Updated!"); location.reload(); }
+    if(error) alert(error.message); else { alert("Standings & Scores Updated!"); location.reload(); }
 }
 
 async function saveBracket() {
@@ -288,18 +288,16 @@ async function saveBracket() {
 
 async function loadLeaderboard() {
     const { data } = await _supabase.from('playoff_picks').select('*');
-    const jack = document.getElementById('jackpot-amount');
     if(!data) return;
-    jack.innerText = `$${data.length * 25}`;
+    document.getElementById('jackpot-amount').innerText = `$${data.length * 25}`;
     const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
     document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
         const team = teamData[e.picks.sb_winner <= 7 ? 'afc' : 'nfc'][e.picks.sb_winner];
-        return `<tr class="hover:bg-slate-800/50">
-            <td class="p-6 font-black ${idx<3 ? 'rank-'+(idx+1) : 'text-slate-600'}">${idx==0?'🏆':'#'+(idx+1)}</td>
-            <td class="p-6 font-bold uppercase text-[11px] text-white text-left tracking-widest">${e.user_name}</td>
-            <td class="p-6 text-blue-400 font-black text-xl">${e.pts}</td>
-            <td class="p-6 flex items-center gap-2 italic uppercase font-black text-xs text-left"><img src="${getLogo(team?.id||'nfl')}" class="w-6 h-6">${team?.name||'TBD'}</td>
-            <td class="p-6 font-bold font-mono text-emerald-500">${e.picks.sb_score.afc}-${e.picks.sb_score.nfc}</td></tr>`;
+        return `<tr><td class="p-6 font-black ${idx<3 ? 'rank-'+(idx+1) : 'text-slate-600'}">${idx==0?'🏆':'#'+(idx+1)}</td>
+        <td class="p-6 font-bold uppercase text-[11px] text-white text-left">${e.user_name}</td>
+        <td class="p-6 text-blue-400 font-black text-xl">${e.pts}</td>
+        <td class="p-6 flex items-center gap-2 italic uppercase font-black text-xs text-left"><img src="${getLogo(team?.id||'nfl')}" class="w-6 h-6">${team?.name||'TBD'}</td>
+        <td class="p-6 font-bold font-mono text-emerald-500">${e.picks.sb_score.afc}-${e.picks.sb_score.nfc}</td></tr>`;
     }).join('');
 }
 
