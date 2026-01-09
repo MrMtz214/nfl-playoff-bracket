@@ -1,137 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROAD TO SB LX | Winner Take All</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
-        .glass { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); }
-        .rank-1 { color: #fbbf24; font-size: 1.25rem; font-weight: 900; }
-        .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
-        .official-loser { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
-        @media (min-width: 1024px) {
-            .connector-line { position: relative; }
-            .connector-line::after {
-                content: ''; position: absolute; top: 50%; width: 2.5rem; height: 2px;
-                background: #1e293b; z-index: -1;
-            }
-            #afc-column .connector-line::after { right: -2.5rem; }
-            #nfc-column .connector-line::after { left: -2.5rem; }
-        }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12 font-sans selection:bg-blue-500/30">
-
-    <div id="rules-overlay" class="fixed inset-0 z-[100] glass flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-lg rounded-3xl border border-blue-500/30 p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
-            <div class="text-center mb-8">
-                <h2 class="text-5xl font-black italic text-blue-400 uppercase tracking-tighter">ROAD TO SB LX</h2>
-                <p class="text-[10px] font-black text-slate-500 tracking-[0.4em] uppercase mt-2">The 2026 Playoff Challenge</p>
-            </div>
-            
-            <div class="space-y-6 mb-8">
-                <div class="bg-emerald-500/10 border-2 border-emerald-500/40 p-8 rounded-3xl text-center shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-                    <p class="text-[11px] font-black text-emerald-500 uppercase tracking-widest mb-3 italic">What's At Stake</p>
-                    <div class="text-6xl mb-4">🏆</div>
-                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter">Winner Take All</h3>
-                    <p class="text-emerald-400 font-bold text-sm mt-2">100% of the pot goes to 1st Place</p>
-                    <p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-4">Entry Fee: $25</p>
-                </div>
-
-                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
-                    <h4 class="text-blue-400 font-black uppercase text-[11px] mb-4 text-center italic tracking-widest">The Path to Glory</h4>
-                    <p class="text-slate-400 text-[11px] mb-6 text-center leading-relaxed">
-                        Points stack for <b>every win</b>. Want the big lead? Pick the underdogs—their seed value is added to your round score!
-                    </p>
-                    <div class="grid grid-cols-2 gap-4 text-[10px] font-black uppercase text-center">
-                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800"><p class="text-slate-500 mb-1">WC</p>5 PTS + SEED</div>
-                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800"><p class="text-slate-500 mb-1">DIV</p>10 PTS + SEED</div>
-                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800"><p class="text-slate-500 mb-1">CONF</p>15 PTS + SEED</div>
-                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800"><p class="text-slate-500 mb-1">SB</p>20 PTS + SEED</div>
-                    </div>
-                </div>
-            </div>
-            
-            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Enter the Arena</button>
-        </div>
-    </div>
-
-    <div id="privacy-overlay" class="fixed inset-0 z-[110] glass hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-2xl">
-            <h3 class="text-blue-400 font-black uppercase text-sm mb-4 italic">🔒 Privacy & Security</h3>
-            <div class="space-y-4 text-xs text-slate-400 leading-relaxed">
-                <p>This application uses <span class="text-white">Google OAuth</span> for secure identity verification. This is common practice to ensure that only you can edit your bracket.</p>
-                <ul class="list-disc pl-5 space-y-2">
-                    <li><span class="text-white">Data Stored:</span> Only your Name and Email address.</li>
-                    <li><span class="text-white">No Password Access:</span> We never see your Google password.</li>
-                    <li><span class="text-white">Zero File Access:</span> We do not have permission to view your Photos, Drive, or Emails.</li>
-                </ul>
-                <p>Your information is used strictly for the leaderboard display and to prevent duplicate entries.</p>
-            </div>
-            <button onclick="document.getElementById('privacy-overlay').classList.add('hidden')" class="mt-8 w-full bg-slate-800 p-4 rounded-xl font-bold uppercase text-[10px] tracking-widest">Close</button>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4">
-        <header class="text-center py-10">
-            <h1 class="text-5xl lg:text-7xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-yellow-400 uppercase">ROAD TO SB LX</h1>
-            <div id="user-display" class="hidden text-slate-500 font-bold uppercase text-[10px] mt-2 italic tracking-widest text-center"></div>
-        </header>
-
-        <div id="admin-panel" class="hidden relative z-[90] mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
-            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-4 tracking-tighter text-center">Commissioner Dashboard</h2>
-            <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest">Update Official Standings</button>
-        </div>
-
-        <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center shadow-2xl mb-12">
-            <div class="mb-6 px-4 py-3 bg-blue-500/5 border border-blue-500/10 rounded-xl">
-                <p class="text-[10px] text-slate-500 italic">🔒 Secure login via Google used for leaderboard identity only.</p>
-            </div>
-            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-4 w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all">Sign In With Google</button>
-        </div>
-
-        <div id="main-content" class="hidden">
-            <div class="flex flex-col lg:flex-row items-start justify-center gap-8 lg:gap-2">
-                <div id="afc-column" class="w-full lg:w-[40%] space-y-12"></div>
-                <div id="sb-column" class="w-full lg:w-[20%] lg:mt-64 flex flex-col items-center"></div>
-                <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
-            </div>
-            <div class="text-center pt-20 mt-20 border-t border-slate-900">
-                <button onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter active:scale-95 transition-all">Lock In My Picks</button>
-            </div>
-        </div>
-
-        <div id="leaderboard-section" class="mt-32 max-w-5xl mx-auto">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-black italic text-slate-700 uppercase tracking-tighter">Live Standings</h2>
-                <div class="inline-block mt-4 px-6 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                    <p class="text-emerald-400 font-black uppercase text-[10px] tracking-widest">💰 Live Jackpot: <span id="jackpot-amount" class="text-white ml-1 font-mono">$0</span></p>
-                </div>
-            </div>
-            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
-                <table class="w-full text-center">
-                    <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
-                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6 text-left">SB Winner</th><th class="p-6">TB</th></tr>
-                    </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <footer class="mt-20 text-center">
-            <button onclick="document.getElementById('privacy-overlay').classList.remove('hidden')" class="text-[9px] text-slate-600 uppercase font-black tracking-[0.2em] hover:text-blue-400 transition-colors">Privacy & Security Information</button>
-        </footer>
-    </div>
-
 <script>
 // --- CONFIG & SUPABASE ---
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
-const COMMISSIONER_EMAIL = 'sergio.e.mtz@gmail.com'; 
+
+// ⚠️ CHANGE THIS TO YOUR 10-DIGIT PHONE (Numbers only)
+const COMMISSIONER_PHONE = '2147143522'; 
+
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const teamData = {
@@ -139,35 +13,47 @@ const teamData = {
     nfc: { 1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 3: { name: "Eagles", id: "phi" }, 4: { name: "Panthers", id: "car" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" }, 7: { name: "Packers", id: "gb" } }
 };
 
-let currentUser = null;
+let userPhone = "";
+let userName = "";
 let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } } };
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
 
-async function handleGoogleLogin() {
-    await _supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } });
+// --- PHONE LOGIN LOGIC ---
+async function handleSimpleLogin() {
+    userName = document.getElementById('login-name').value.trim();
+    userPhone = document.getElementById('login-phone').value.replace(/\D/g,'');
+    
+    if(userName.length < 2 || userPhone.length < 10) { 
+        alert("Please enter a name and a valid 10-digit phone number."); 
+        return; 
+    }
+    
+    // Check if user exists
+    const { data } = await _supabase.from('playoff_picks').select('*').eq('id', userPhone).single();
+    if (data) {
+        picks = data.picks;
+        userName = data.user_name; // Keep their original saved name
+    }
+    
+    document.getElementById('auth-section').classList.add('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    document.getElementById('user-display').innerText = `Logged in: ${userName}`;
+    
+    if(userPhone === COMMISSIONER_PHONE) {
+        document.getElementById('admin-panel').classList.remove('hidden');
+    }
+    render();
 }
 
 async function init() {
-    _supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session) {
-            currentUser = session.user;
-            if(currentUser.email.toLowerCase() === COMMISSIONER_EMAIL.toLowerCase()) document.getElementById('admin-panel').classList.remove('hidden');
-            const { data } = await _supabase.from('playoff_picks').select('*').eq('id', currentUser.id).single();
-            if (data) picks = data.picks;
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('user-display').innerText = `Logged in: ${currentUser.user_metadata.full_name}`;
-            document.getElementById('user-display').classList.remove('hidden');
-            render();
-        }
-    });
     const { data: mRes } = await _supabase.from('master_results').select('*').single();
     if(mRes) realResults = mRes.data;
     loadLeaderboard();
 }
 
+// --- RENDER FUNCTIONS ---
 function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
@@ -182,7 +68,7 @@ function render() {
         }
     });
     if(picks.afc.conf && picks.nfc.conf) renderSuperBowl(document.getElementById('sb-column'));
-    if(currentUser?.email.toLowerCase() === COMMISSIONER_EMAIL.toLowerCase()) renderAdminControls();
+    if(!document.getElementById('admin-panel').classList.contains('hidden')) renderAdminControls();
 }
 
 function createRoundUI(conf, round, title, matchups) {
@@ -193,17 +79,18 @@ function createRoundUI(conf, round, title, matchups) {
         card.className = "connector-line bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-4 shadow-xl";
         const hS = m.h || m[0], aS = m.a || m[1];
         const mKey = round === 'wc' ? `${m[0]}v${m[1]}` : (round === 'div' ? `d${idx}` : 'champ');
+        
         [hS, aS].forEach(seed => {
             const team = teamData[conf][seed];
-            const winner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
+            const win = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
             const gScores = realResults.scores?.[conf]?.[round]?.[mKey] || {};
             const teamScore = gScores[seed] !== undefined ? gScores[seed] : "";
-            let sClass = ""; if (winner) sClass = (String(winner) === String(seed)) ? "official-winner" : "official-loser";
+            let sClass = ""; if (win) sClass = (String(win) === String(seed)) ? "official-winner" : "official-loser";
             const isSel = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mKey] === seed;
             const btn = document.createElement('button');
             btn.className = `w-full p-4 flex items-center justify-between transition ${sClass} ${isSel && !sClass ? 'selected' : 'hover:bg-slate-800'}`;
             btn.innerHTML = `<div class="flex items-center gap-4 text-left"><span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span><img src="${getLogo(team.id)}" class="w-8 h-8"><span class="font-bold uppercase italic text-xs">${team.name}</span></div><span class="font-mono font-black text-sm pr-2">${teamScore}</span>`;
-            btn.onclick = () => { if (winner) return; if(round === 'wc') { picks[conf].wc[mKey] = seed; picks[conf].div = {}; picks[conf].conf = null; } else if(round === 'div') { picks[conf].div[mKey] = seed; picks[conf].conf = null; } else picks[conf].conf = seed; picks.sb_winner = null; render(); };
+            btn.onclick = () => { if (win) return; if(round === 'wc') { picks[conf].wc[mKey] = seed; picks[conf].div = {}; picks[conf].conf = null; } else if(round === 'div') { picks[conf].div[mKey] = seed; picks[conf].conf = null; } else picks[conf].conf = seed; picks.sb_winner = null; render(); };
             card.appendChild(btn);
         });
         sec.appendChild(card);
@@ -216,10 +103,10 @@ function renderSuperBowl(c) {
     c.innerHTML = `<h2 class="text-4xl font-black italic mb-8 text-yellow-500 uppercase">Super Bowl LX</h2>`;
     const flex = document.createElement('div'); flex.className = "flex lg:flex-col gap-6 items-center mb-8";
     [{c:'afc', s:picks.afc.conf}, {c:'nfc', s:picks.nfc.conf}].forEach(t => {
-        const team = teamData[t.c][t.s]; const win = picks.sb_winner === t.s;
+        const team = teamData[t.c][t.s]; const isSel = picks.sb_winner === t.s;
         let sc = ""; if (offSB) sc = (String(offSB) === String(t.s)) ? "official-winner" : "official-loser";
-        const d = document.createElement('div'); d.className = `cursor-pointer p-6 rounded-3xl border-2 transition ${sc} ${win && !sc ? 'selected scale-110 shadow-2xl' : 'bg-slate-800 border-transparent'}`;
-        d.innerHTML = `<img src="${getLogo(team.id)}" class="w-24 h-24 mb-2"><p class="font-black italic uppercase text-[10px] text-center">${team.name}</p>`;
+        const d = document.createElement('div'); d.className = `cursor-pointer p-6 rounded-3xl border-2 transition ${sc} ${isSel && !sc ? 'selected scale-110 shadow-2xl' : 'bg-slate-800 border-transparent'}`;
+        d.innerHTML = `<img src="${getLogo(team.id)}" class="w-24 h-24 mb-2 text-center"><p class="font-black italic uppercase text-[10px] text-center">${team.name}</p>`;
         d.onclick = () => { if(!offSB) { picks.sb_winner = t.s; render(); } }; flex.appendChild(d);
     });
     c.appendChild(flex);
@@ -228,6 +115,7 @@ function renderSuperBowl(c) {
     c.appendChild(scoreUI);
 }
 
+// --- ADMIN & DATA ---
 async function renderAdminControls() {
     const ctrl = document.getElementById('admin-controls'); ctrl.innerHTML = '';
     const rosterSec = document.createElement('div'); rosterSec.className = "col-span-full bg-slate-950 p-6 rounded-2xl border border-slate-800 mb-8";
@@ -239,15 +127,14 @@ async function renderAdminControls() {
         rosterSec.appendChild(row);
     }); } ctrl.appendChild(rosterSec);
 
-    if (!realResults.scores) realResults.scores = { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } };
     ['afc','nfc'].forEach(conf => {
-        const sec = document.createElement('div'); sec.innerHTML = `<h3 class="uppercase font-black text-[10px] text-slate-500 mb-6 border-b border-slate-800 pb-2">${conf} Score Updates</h3>`;
+        const sec = document.createElement('div'); sec.innerHTML = `<h3 class="uppercase font-black text-[10px] text-slate-500 mb-6 border-b border-slate-800 pb-2">${conf} Updates</h3>`;
         const addGameAdmin = (lbl, round, mKey) => {
-            const winner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
+            const win = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
             const d = document.createElement('div'); d.className = "mb-6 p-4 bg-black/40 rounded-xl border border-slate-800";
             d.innerHTML = `<label class="block text-[9px] mb-2 font-black text-slate-400 uppercase">${lbl}</label>`;
             const s = document.createElement('select'); s.className = "bg-slate-900 border border-slate-700 p-2 w-full text-[11px] rounded text-white mb-3";
-            s.innerHTML = `<option value="">Winner</option>` + Object.keys(teamData[conf]).map(seed => `<option value="${seed}" ${winner == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
+            s.innerHTML = `<option value="">Winner</option>` + Object.keys(teamData[conf]).map(seed => `<option value="${seed}" ${win == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
             s.onchange = (e) => { if(round === 'conf') realResults[conf].conf = e.target.value; else realResults[conf][round][mKey] = e.target.value; };
             d.appendChild(s);
             const sFlex = document.createElement('div'); sFlex.className = "flex gap-2";
@@ -261,12 +148,15 @@ async function renderAdminControls() {
     });
 }
 
-async function togglePaid(userId, currentStatus) { await _supabase.from('playoff_picks').update({ is_paid: !currentStatus }).eq('id', userId); location.reload(); }
-async function saveAdminScores() { await _supabase.from('master_results').upsert({ id: 1, data: realResults, updated_at: new Date().toISOString() }); alert("Scores Updated!"); location.reload(); }
-async function saveBracket() { await _supabase.from('playoff_picks').upsert({ id: currentUser.id, user_name: currentUser.user_metadata.full_name, email: currentUser.email, picks: picks }); alert("Bracket Locked!"); }
+async function togglePaid(id, s) { await _supabase.from('playoff_picks').update({ is_paid: !s }).eq('id', id); location.reload(); }
+async function saveAdminScores() { await _supabase.from('master_results').upsert({ id: 1, data: realResults, updated_at: new Date().toISOString() }); alert("Scores Saved!"); location.reload(); }
+async function saveBracket() { 
+    const { error } = await _supabase.from('playoff_picks').upsert({ id: userPhone, user_name: userName, phone: userPhone, picks: picks }); 
+    if(error) alert("Error: " + error.message); else alert("Picks Locked Successfully!"); location.reload(); 
+}
 async function loadLeaderboard() {
     const { data } = await _supabase.from('playoff_picks').select('*'); if(!data) return;
-    const paidUsers = data.filter(u => u.is_paid); document.getElementById('jackpot-amount').innerText = `$${paidUsers.length * 25}`;
+    const paid = data.filter(u => u.is_paid); document.getElementById('jackpot-amount').innerText = `$${paid.length * 25}`;
     const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
     document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
         const team = teamData[e.picks.sb_winner <= 7 ? 'afc' : 'nfc'][e.picks.sb_winner];
@@ -281,8 +171,8 @@ async function loadLeaderboard() {
 
 function calculatePoints(uP) {
     let pts = 0; ['afc','nfc'].forEach(c => {
-        Object.keys(realResults[c].wc).forEach(k => { const win = realResults[c].wc[k]; if(win && uP[c].wc[k] == win) pts += (5 + parseInt(win)); });
-        Object.keys(realResults[c].div).forEach(k => { const win = realResults[c].div[k]; if(win && uP[c].div[k] == win) pts += (10 + parseInt(win)); });
+        Object.keys(realResults[c].wc).forEach(k => { const w = realResults[c].wc[k]; if(w && uP[c].wc[k] == w) pts += (5 + parseInt(w)); });
+        Object.keys(realResults[c].div).forEach(k => { const w = realResults[c].div[k]; if(w && uP[c].div[k] == w) pts += (10 + parseInt(w)); });
         if(realResults[c].conf && uP[c].conf == realResults[c].conf) pts += (15 + parseInt(realResults[c].conf));
     });
     if(realResults.sb_winner && uP.sb_winner == realResults.sb_winner) pts += (20 + parseInt(realResults.sb_winner));
@@ -291,5 +181,3 @@ function calculatePoints(uP) {
 
 init();
 </script>
-</body>
-</html>
