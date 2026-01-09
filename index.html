@@ -30,16 +30,16 @@
             <div class="text-center mb-8">
                 <h2 class="text-5xl font-black italic text-blue-400 uppercase tracking-tighter">ROAD TO SB LX</h2>
             </div>
-            <div class="space-y-6 mb-8">
-                <div class="bg-emerald-500/10 border-2 border-emerald-500/40 p-8 rounded-3xl text-center shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+            <div class="space-y-6 mb-8 text-center">
+                <div class="bg-emerald-500/10 border-2 border-emerald-500/40 p-8 rounded-3xl shadow-[0_0_30px_rgba(16,185,129,0.1)]">
                     <p class="text-[11px] font-black text-emerald-500 uppercase tracking-widest mb-3 italic">The Stakes</p>
                     <div class="text-6xl mb-4">🏆</div>
                     <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter">Winner Take All</h3>
                     <p class="text-emerald-400 font-bold text-sm mt-2 italic">Entry: $25</p>
                 </div>
-                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center">
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
                     <h4 class="text-blue-400 font-black uppercase text-[11px] mb-4 italic tracking-widest">Strategist Scoring</h4>
-                    <p class="text-slate-400 text-[11px] mb-4 leading-relaxed italic">Points = Round Base + Team Seed</p>
+                    <p class="text-slate-400 text-[11px] mb-4 leading-relaxed">Picks earn Base Round Points + Team Seed!</p>
                     <div class="grid grid-cols-2 gap-2 text-[10px] font-black uppercase">
                         <div class="bg-slate-900 p-2 rounded">WC: 5+Seed</div>
                         <div class="bg-slate-900 p-2 rounded">DIV: 10+Seed</div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest shadow-lg">Enter the Arena</button>
+            <button onclick="document.getElementById('rules-overlay').classList.add('hidden')" class="w-full bg-blue-600 hover:bg-blue-500 p-5 rounded-2xl font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">Enter the Arena</button>
         </div>
     </div>
 
@@ -58,17 +58,17 @@
         </header>
 
         <div id="admin-panel" class="hidden relative z-[90] mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
-            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-6 tracking-tighter text-center italic">Commissioner Controls</h2>
+            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-8 tracking-tighter text-center italic">Commissioner Controls</h2>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-4 rounded-xl font-black uppercase text-xs tracking-widest italic">Update Live Results</button>
+            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-5 rounded-xl font-black uppercase text-xs tracking-widest italic transition-all shadow-xl">Update Official Results</button>
         </div>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12 relative z-[50]">
             <h3 class="text-center text-blue-400 font-black uppercase tracking-widest mb-6 italic">Secure Entry</h3>
             <div class="space-y-4">
-                <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500">
-                <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500">
-                <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200">Enter Pool</button>
+                <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500 transition-all">
+                <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500 transition-all">
+                <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all">Enter Pool</button>
             </div>
         </div>
 
@@ -80,7 +80,7 @@
                 <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
             </div>
             <div class="text-center pt-20 mt-20 border-t border-slate-900">
-                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter">Lock In Picks</button>
+                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter active:scale-95 transition-all">Lock In Picks</button>
             </div>
         </div>
 
@@ -94,7 +94,7 @@
             <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
                 <table class="w-full text-center">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
-                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Participant</th><th class="p-6">Score</th><th class="p-6 text-left">SB Winner</th><th class="p-6">TB</th></tr>
+                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6 text-left">SB Winner</th><th class="p-6">TB</th></tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm text-slate-300"></tbody>
                 </table>
@@ -103,10 +103,10 @@
     </div>
 
 <script>
-// --- COMMISSIONER CONFIG ---
+// --- CONFIG (ENTER YOUR PHONE) ---
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
-const COMMISSIONER_PHONE = '2147143522'; // ENTER YOUR REAL PHONE HERE
+const COMMISSIONER_PHONE = 'YOUR_PHONE_NUMBER'; // 10 digits only
 
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -117,7 +117,7 @@ const teamData = {
 };
 
 let userPhone = ""; let userName = ""; let isLocked = false;
-let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } } };
+let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} }, sb: {} } };
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_score: { afc: 0, nfc: 0 } };
 
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
@@ -147,7 +147,7 @@ function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
         col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8 text-center lg:text-left">${conf}</h2>`;
-        col.appendChild(createRoundUI(conf, 'wc', "Wild Card Round", [[2,7], [3,6], [4,5]]));
+        col.appendChild(createRoundUI(conf, 'wc', "Wild Card Weekend", [[2,7], [3,6], [4,5]]));
         const wcW = Object.values(picks[conf].wc);
         if(wcW.length === 3) {
             const sorted = [1, ...wcW].sort((a,b) => a-b);
@@ -171,7 +171,7 @@ function createRoundUI(conf, round, title, matchups) {
         [hS, aS].forEach(seed => {
             const team = teamData[conf][seed];
             const winner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
-            const gScores = realResults.scores?.[conf]?.[round]?.[mKey] || {};
+            const gScores = (realResults.scores && realResults.scores[conf][round][mKey]) ? realResults.scores[conf][round][mKey] : {};
             const teamScore = gScores[seed] !== undefined ? gScores[seed] : "";
             let sClass = ""; if (winner) sClass = (String(winner) === String(seed)) ? "official-winner" : "official-loser";
             const isSel = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mKey] === seed;
@@ -190,11 +190,16 @@ function renderSuperBowl(c) {
     const offSB = realResults.sb_winner;
     c.innerHTML = `<h2 class="text-4xl font-black italic mb-8 text-yellow-500 uppercase italic">Super Bowl LX</h2>`;
     const flex = document.createElement('div'); flex.className = "flex lg:flex-col gap-6 items-center mb-8";
-    [{c:'afc', s:picks.afc.conf}, {c:'nfc', s:picks.nfc.conf}].forEach(t => {
-        const team = teamData[t.c][t.s]; const isSel = picks.sb_winner === t.s;
+    
+    // The teams in the SB are determined by the user's conference winner picks
+    const afcTeam = teamData.afc[picks.afc.conf];
+    const nfcTeam = teamData.nfc[picks.nfc.conf];
+
+    [{c:'afc', s:picks.afc.conf, team:afcTeam}, {c:'nfc', s:picks.nfc.conf, team:nfcTeam}].forEach(t => {
+        const isSel = picks.sb_winner === t.s;
         let sc = ""; if (offSB) sc = (String(offSB) === String(t.s)) ? "official-winner" : "official-loser";
         const d = document.createElement('div'); d.className = `cursor-pointer p-6 rounded-3xl border-2 transition ${sc} ${isSel && !sc ? 'selected scale-110 shadow-2xl' : 'bg-slate-800 border-transparent'}`;
-        d.innerHTML = `<img src="${getLogo(team.id)}" class="w-24 h-24 mb-2"><p class="font-black italic uppercase text-[10px] text-center">${team.name}</p>`;
+        d.innerHTML = `<img src="${getLogo(t.team.id)}" class="w-24 h-24 mb-2"><p class="font-black italic uppercase text-[10px] text-center">${t.team.name}</p>`;
         d.onclick = () => { if(!offSB && !isLocked) { picks.sb_winner = t.s; render(); } }; flex.appendChild(d);
     });
     c.appendChild(flex);
@@ -205,10 +210,13 @@ function renderSuperBowl(c) {
 
 async function renderAdminControls() {
     const ctrl = document.getElementById('admin-controls'); ctrl.innerHTML = '';
+    
+    // 1. ROUND LOCK
     const lBox = document.createElement('div'); lBox.className = "col-span-full bg-slate-950 p-6 rounded-xl border border-amber-500/30 mb-8 flex justify-between items-center";
     lBox.innerHTML = `<div><p class="text-amber-500 font-black uppercase text-[10px] italic">Global Round Lock</p></div><button onclick="handleLockToggle('wildcard', ${isLocked})" class="px-8 py-2 rounded-full font-black uppercase text-[10px] italic ${isLocked ? 'bg-red-600' : 'bg-emerald-600'}">${isLocked ? '🔒 UNLOCK ROUND' : '🔓 LOCK WILD CARD'}</button>`;
     ctrl.appendChild(lBox);
 
+    // 2. PAYMENT ROSTER
     const rosterSec = document.createElement('div'); rosterSec.className = "col-span-full bg-slate-950 p-4 rounded-xl border border-slate-800 mb-8";
     const { data: users } = await _supabase.from('playoff_picks').select('id, user_name, is_paid');
     if(users) { users.forEach(u => {
@@ -217,18 +225,61 @@ async function renderAdminControls() {
         rosterSec.appendChild(row);
     }); } ctrl.appendChild(rosterSec);
 
+    // 3. SCOREBOARD
     ['afc','nfc'].forEach(conf => {
-        const sec = document.createElement('div'); sec.innerHTML = `<h3 class="uppercase font-black text-[10px] text-slate-500 mb-4 italic">${conf} Result Updates</h3>`;
+        const sec = document.createElement('div'); sec.innerHTML = `<h3 class="uppercase font-black text-[10px] text-slate-500 mb-4 italic">${conf.toUpperCase()} Updates</h3>`;
         const addGameAdmin = (lbl, round, mKey) => {
             const win = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
-            const d = document.createElement('div'); d.className = "mb-4 p-3 bg-black/40 rounded-xl border border-slate-800";
-            const s = document.createElement('select'); s.className = "bg-slate-900 border border-slate-700 p-2 w-full text-[11px] rounded mb-2 text-white italic";
-            s.innerHTML = `<option value="">Select Winner</option>` + Object.keys(teamData[conf]).map(seed => `<option value="${seed}" ${win == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
+            const d = document.createElement('div'); d.className = "mb-6 p-4 bg-black/40 rounded-xl border border-slate-800";
+            
+            const s = document.createElement('select'); s.className = "bg-slate-900 border border-slate-700 p-2 w-full text-[11px] rounded mb-3 text-white italic";
+            s.innerHTML = `<option value="">Winner</option>` + Object.keys(teamData[conf]).map(seed => `<option value="${seed}" ${win == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
             s.onchange = (e) => { if(round === 'conf') realResults[conf].conf = e.target.value; else realResults[conf][round][mKey] = e.target.value; };
-            d.appendChild(s); sec.appendChild(d);
+            d.appendChild(s);
+
+            const sFlex = document.createElement('div'); sFlex.className = "flex gap-2";
+            const seeds = mKey.includes('v') ? mKey.split('v') : (realResults[conf][round][mKey] ? [realResults[conf].div.d0, realResults[conf].div.d1] : []); // simplified for now
+            seeds.forEach(seed => {
+                if(!seed) return;
+                const inp = document.createElement('input'); inp.type = "number"; inp.placeholder = teamData[conf][seed].name;
+                inp.className = "w-1/2 bg-slate-800 border border-slate-700 p-2 text-[10px] rounded text-white text-center";
+                inp.value = (realResults.scores && realResults.scores[conf][round][mKey]) ? realResults.scores[conf][round][mKey][seed] : "";
+                inp.oninput = (e) => {
+                    if (!realResults.scores) realResults.scores = { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} }, sb: {} };
+                    if (!realResults.scores[conf][round][mKey]) realResults.scores[conf][round][mKey] = {};
+                    realResults.scores[conf][round][mKey][seed] = e.target.value;
+                };
+                sFlex.appendChild(inp);
+            });
+            d.prepend(Object.assign(document.createElement('label'), {className:"block text-[9px] mb-2 text-slate-400 font-black italic", innerText: lbl}));
+            d.appendChild(sFlex); sec.appendChild(d);
         };
-        addGameAdmin("WC Game 1", "wc", "2v7"); addGameAdmin("WC Game 2", "wc", "3v6"); addGameAdmin("WC Game 3", "wc", "4v5"); ctrl.appendChild(sec);
+        addGameAdmin("Wild Card 1", "wc", "2v7"); addGameAdmin("Wild Card 2", "wc", "3v6"); addGameAdmin("Wild Card 3", "wc", "4v5"); ctrl.appendChild(sec);
     });
+
+    // 4. SUPER BOWL FINAL (Restored Score Inputs)
+    const sbSec = document.createElement('div'); sbSec.className = "col-span-full mt-8 p-6 bg-yellow-500/5 rounded-3xl border border-yellow-500/20";
+    sbSec.innerHTML = `<h3 class="text-yellow-500 font-black uppercase text-xs mb-6 italic tracking-widest text-center">Super Bowl LX Official Result</h3>`;
+    
+    // SB Winner Select
+    const winSel = document.createElement('select'); winSel.className = "w-full bg-slate-900 border border-slate-700 p-4 rounded-xl text-white font-black italic mb-6";
+    let sbOptions = `<option value="">Select Champion</option>`;
+    ['afc','nfc'].forEach(c => Object.keys(teamData[c]).forEach(s => sbOptions += `<option value="${s}" ${realResults.sb_winner == s ? 'selected' : ''}>${teamData[c][s].name}</option>`));
+    winSel.innerHTML = sbOptions;
+    winSel.onchange = (e) => { realResults.sb_winner = e.target.value; };
+    sbSec.appendChild(winSel);
+
+    // SB Scores
+    const sbScoreFlex = document.createElement('div'); sbScoreFlex.className = "flex gap-4";
+    ['afc','nfc'].forEach(c => {
+        const inp = document.createElement('input'); inp.type = "number"; inp.placeholder = `${c.toUpperCase()} Score`;
+        inp.className = "w-1/2 bg-slate-800 border border-slate-700 p-4 rounded-xl text-white font-black text-center";
+        inp.value = realResults.scores.sb ? realResults.scores.sb[c] : "";
+        inp.oninput = (e) => { if(!realResults.scores.sb) realResults.scores.sb = {}; realResults.scores.sb[c] = e.target.value; };
+        sbScoreFlex.appendChild(inp);
+    });
+    sbSec.appendChild(sbScoreFlex);
+    ctrl.appendChild(sbSec);
 }
 
 async function handleLockToggle(r, s) { if(!confirm(`Toggle lock for ${r}?`)) return; await _supabase.from('round_status').update({ is_locked: !s }).eq('round_id', r); location.reload(); }
