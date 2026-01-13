@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
-        .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; }
         .official-loser { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
         .timer-glow { text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); }
     </style>
@@ -24,17 +24,17 @@
             </div>
         </header>
 
-        <div id="admin-panel" class="hidden relative z-[90] mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
-            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-8 tracking-tighter text-center">Commissioner Dashboard</h2>
+        <div id="admin-panel" class="hidden mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
+            <h2 class="text-2xl font-black italic text-red-500 uppercase mb-8 text-center">Commissioner Dashboard</h2>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-5 rounded-xl font-black uppercase text-xs tracking-widest italic shadow-xl">Update Official Results</button>
+            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 p-5 rounded-xl font-black uppercase italic">Update Official Results</button>
         </div>
 
-        <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12">
+        <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 mb-12">
             <h3 class="text-center text-blue-400 font-black uppercase tracking-widest mb-6 italic">Secure Entry</h3>
             <div class="space-y-4">
-                <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500">
-                <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500">
+                <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none">
+                <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none">
                 <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200">Enter Pool</button>
             </div>
         </div>
@@ -47,20 +47,20 @@
                 <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
             </div>
             <div class="text-center pt-20 mt-20 border-t border-slate-900">
-                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter transition-all">Lock In My Picks</button>
-                <p id="lock-msg" class="text-red-500 font-black uppercase text-[10px] mt-4 hidden italic tracking-widest text-center">🚫 Entries Closed</p>
+                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-24 py-6 rounded-full font-black text-2xl uppercase italic">Lock In My Picks</button>
+                <p id="lock-msg" class="text-red-500 font-black uppercase text-[10px] mt-4 hidden italic text-center">🚫 Entries Closed</p>
             </div>
         </div>
 
         <div id="leaderboard-section" class="mt-32 max-w-5xl mx-auto">
-            <h2 class="text-center text-3xl font-black italic text-slate-700 uppercase tracking-tighter mb-10">Live Standings</h2>
+            <h2 class="text-center text-3xl font-black italic text-slate-700 uppercase mb-10">Live Standings</h2>
             <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
                 <table class="w-full text-center">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
                         <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6 text-left">SB Winner</th><th class="p-6">TB</th></tr>
                     </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm text-slate-300">
-                        <tr><td colspan="5" class="p-10 text-slate-500 italic">Syncing with scoreboard...</td></tr>
+                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 text-sm text-slate-300 italic">
+                        <tr><td colspan="5" class="p-10 text-slate-500 italic">Syncing with database...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -70,11 +70,9 @@
 <script>
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
-const COMMISSIONER_PHONE = '2147143522'; // 10 DIGITS
+const COMMISSIONER_PHONE = '2147143522'; 
 
-const kickoffs = {
-    divisional: new Date("2026-01-17T16:30:00-05:00")
-};
+const kickoffs = { divisional: new Date("2026-01-17T16:30:00-05:00") };
 
 const { createClient } = supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -85,7 +83,7 @@ const teamData = {
 };
 
 let userPhone = ""; let userName = ""; 
-let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_winner_conf: null, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} }, sb: {} } };
+let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_winner_conf: null, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } } };
 let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_winner_conf: null, sb_score: { afc: 0, nfc: 0 } };
 
 function updateTimer() {
