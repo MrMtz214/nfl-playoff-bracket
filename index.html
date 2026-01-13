@@ -7,54 +7,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); }
         .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; }
         .official-loser { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
-        .timer-glow { text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans text-center">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans">
 
     <div class="max-w-7xl mx-auto px-4">
-        <header class="py-10">
+        <header class="text-center py-10">
             <h1 class="text-5xl lg:text-7xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-yellow-400 uppercase tracking-tighter mb-4">ROAD TO SB LX</h1>
-            <div class="inline-block bg-slate-900/80 px-8 py-3 rounded-3xl border border-slate-800 shadow-2xl mb-6">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Divisional Lock Countdown</p>
-                <span id="divisional-timer" class="text-2xl font-mono font-black text-yellow-500 timer-glow uppercase italic">00D 00H 00M 00S</span>
-            </div>
+            <p class="text-slate-500 uppercase font-black tracking-widest text-xs italic">Divisional Round - Picks Open</p>
         </header>
 
-        <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 mb-12 shadow-2xl">
+        <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12">
             <h3 class="text-center text-blue-400 font-black uppercase tracking-widest mb-6 italic">Secure Entry</h3>
             <div class="space-y-4">
-                <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none">
-                <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none">
-                <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase hover:bg-slate-200 transition-all">Enter Pool</button>
+                <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500">
+                <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none focus:border-blue-500">
+                <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200">Enter Pool</button>
             </div>
         </div>
 
         <div id="main-content" class="hidden">
-            <div id="user-display" class="text-slate-500 font-bold uppercase text-[10px] mb-8 italic"></div>
+            <div id="user-display" class="text-slate-500 font-bold uppercase text-[10px] mb-8 italic tracking-widest text-center"></div>
             <div class="flex flex-col lg:flex-row items-start justify-center gap-8 lg:gap-2">
-                <div id="afc-column" class="w-full lg:w-[40%] space-y-12 text-center lg:text-left"></div>
+                <div id="afc-column" class="w-full lg:w-[40%] space-y-12"></div>
                 <div id="sb-column" class="w-full lg:w-[20%] lg:mt-64 flex flex-col items-center"></div>
-                <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 text-center lg:text-right"></div>
+                <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
             </div>
             <div class="text-center pt-20 mt-20 border-t border-slate-900">
-                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-24 py-6 rounded-full font-black text-2xl uppercase italic shadow-2xl hover:bg-emerald-500 transition-all">Lock In My Picks</button>
+                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 hover:bg-emerald-500 px-24 py-6 rounded-full font-black text-2xl shadow-2xl uppercase italic tracking-tighter transition-all">Lock In My Picks</button>
             </div>
         </div>
 
         <div id="leaderboard-section" class="mt-32 max-w-5xl mx-auto">
-            <h2 class="text-center text-3xl font-black italic text-slate-700 uppercase mb-10 tracking-tighter">Live Standings</h2>
-            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
+            <h2 class="text-center text-3xl font-black italic text-slate-700 uppercase tracking-tighter mb-10">Live Standings</h2>
+            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
                 <table class="w-full text-center">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black">
-                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6 font-mono">TB</th></tr>
+                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th></tr>
                     </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 text-sm text-slate-300 italic">
-                        <tr><td colspan="4" class="p-10 text-slate-500 italic">Syncing scores...</td></tr>
-                    </tbody>
+                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm text-slate-300"></tbody>
                 </table>
             </div>
         </div>
@@ -63,9 +57,9 @@
 <script>
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
-const kickoffs = { divisional: new Date("2026-01-17T16:30:00-05:00") };
 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const { createClient } = supabase;
+const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const teamData = {
     afc: { 1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" } },
@@ -73,65 +67,35 @@ const teamData = {
 };
 
 let userPhone = ""; let userName = ""; 
-let realResults = { afc: { wc: {}, div: {} }, nfc: { wc: {}, div: {} } };
 let picks = { afc: { div: {} }, nfc: { div: {} }, sb_score: { afc: 0, nfc: 0 } };
-
-function updateTimer() {
-    const timerEl = document.getElementById('divisional-timer');
-    if (!timerEl) return;
-    const diff = kickoffs.divisional - new Date();
-    if (diff <= 0) { timerEl.innerHTML = "🔒 LOCKED"; return; }
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    timerEl.innerHTML = `${d}D ${h}H ${m}M ${s}S`;
-}
-setInterval(updateTimer, 1000);
 
 async function handleSimpleLogin() {
     userName = document.getElementById('login-name').value.trim();
     userPhone = document.getElementById('login-phone').value.replace(/\D/g,'');
     const { data } = await _supabase.from('playoff_picks').select('*').eq('id', userPhone).single();
-    if (data) { 
-        if (data.picks) picks = data.picks; 
-        userName = data.user_name; 
-    }
+    if (data) { picks = data.picks; userName = data.user_name; }
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
-    document.getElementById('user-display').innerText = `Predictor: ${userName}`;
+    document.getElementById('user-display').innerText = `Logged in: ${userName}`;
     render();
-}
-
-async function init() {
-    const { data } = await _supabase.from('master_results').select('*').single();
-    if(data) realResults = data.data;
-    loadLeaderboard();
-    updateTimer();
 }
 
 function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
         col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8">${conf}</h2>`;
-        
-        const matchups = [{h: 1, a: 6}, {h: 2, a: 5}];
-        matchups.forEach((m, idx) => {
+        const matches = [{h: 1, a: 6}, {h: 2, a: 5}];
+        matches.forEach((m, idx) => {
             const card = document.createElement('div');
             card.className = "bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-4 shadow-xl";
             const mK = `d${idx}`;
             [m.h, m.a].forEach(seed => {
                 const team = teamData[conf][seed];
-                const isS = (picks[conf]?.div?.[mK] == seed);
+                const isS = picks[conf]?.div?.[mK] === seed;
                 const btn = document.createElement('button');
                 btn.className = `w-full p-4 flex items-center justify-between transition ${isS ? 'selected' : 'hover:bg-slate-800'}`;
                 btn.innerHTML = `<div class="flex items-center gap-4 text-left"><span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span><img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-8 h-8"><span class="font-bold uppercase italic text-xs text-white">${team.name}</span></div>`;
-                btn.onclick = () => { 
-                    if(new Date() > kickoffs.divisional) return; 
-                    if(!picks[conf].div) picks[conf].div = {};
-                    picks[conf].div[mK] = seed; 
-                    render(); 
-                };
+                btn.onclick = () => { picks[conf].div[mK] = seed; render(); };
                 card.appendChild(btn);
             });
             col.appendChild(card);
@@ -140,45 +104,21 @@ function render() {
 }
 
 async function saveBracket() { 
-    if(new Date() > kickoffs.divisional) return;
     const { error } = await _supabase.from('playoff_picks').upsert({ id: userPhone, user_name: userName, picks: picks }); 
-    if(error) alert(error.message); else { alert("Picks Locked In!"); location.reload(); }
+    if(error) alert(error.message); else { alert("Picks Saved!"); location.reload(); }
 }
 
 async function loadLeaderboard() {
     const { data } = await _supabase.from('playoff_picks').select('*'); if(!data) return;
-    const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
-    document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
-        const score = isNaN(e.pts) ? 0 : e.pts;
-        return `<tr class="hover:bg-slate-800/50">
-            <td class="p-6 font-black ${idx==0?'text-yellow-500':'text-slate-600'}">#${idx+1}</td>
+    // Back to simple display - no math, just showing the 13 names
+    document.getElementById('leaderboard-body').innerHTML = data.map((e, idx) => `
+        <tr class="hover:bg-slate-800/50">
+            <td class="p-6 font-black text-slate-600">#${idx+1}</td>
             <td class="p-6 text-left font-bold uppercase text-white">${e.user_name}</td>
-            <td class="p-6 text-blue-400 font-black text-xl">${score}</td>
-            <td class="p-6 font-mono text-emerald-500 text-xs italic">${e.picks?.sb_score?.afc || 0}-${e.picks?.sb_score?.nfc || 0}</td>
-        </tr>`}).join('');
+            <td class="p-6 text-blue-400 font-black">SYNCED</td>
+        </tr>`).join('');
 }
-
-function calculatePoints(uP) {
-    let pts = 0; if(!uP || !realResults) return 0;
-    ['afc','nfc'].forEach(c => {
-        if(realResults[c]?.wc && uP[c]?.wc) {
-            Object.keys(realResults[c].wc).forEach(k => { 
-                if(uP[c].wc[k] == realResults[c].wc[k]) {
-                    pts += (5 + (Number(realResults[c].wc[k]) || 0)); 
-                }
-            });
-        }
-        if(realResults[c]?.div && uP[c]?.div) {
-            Object.keys(realResults[c].div).forEach(k => { 
-                if(uP[c].div[k] == realResults[c].div[k]) {
-                    pts += (10 + (Number(realResults[c].div[k]) || 0)); 
-                }
-            });
-        }
-    });
-    return isNaN(pts) ? 0 : pts;
-}
-init();
+loadLeaderboard();
 </script>
 </body>
 </html>
