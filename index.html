@@ -53,7 +53,7 @@
                         <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6">SB Winner</th><th class="p-6 font-mono">TB</th></tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-800 text-sm text-slate-300 italic">
-                        <tr><td colspan="5" class="p-10 text-slate-500 italic">Syncing with database...</td></tr>
+                        <tr><td colspan="5" class="p-10 text-slate-500 italic">Calculating Standings...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -93,7 +93,7 @@ async function handleSimpleLogin() {
     userName = document.getElementById('login-name').value.trim();
     userPhone = document.getElementById('login-phone').value.replace(/\D/g,'');
     const { data } = await _supabase.from('playoff_picks').select('*').eq('id', userPhone).single();
-    if (data) { picks = data.picks; userName = data.user_name; }
+    if (data && data.picks) { picks = data.picks; userName = data.user_name; }
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('user-display').innerText = `Predictor: ${userName}`;
@@ -111,14 +111,8 @@ function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
         col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8">${conf}</h2>`;
-        
-        // 1. Wild Card (Display Only)
         col.appendChild(createRoundUI(conf, 'wc', "Wild Card Results", [[2,7], [3,6], [4,5]]));
-        
-        // 2. Official Divisional Matchups (Forced Reseeding)
         col.appendChild(createRoundUI(conf, 'div', "Divisional Round", [{h: 1, a: 6}, {h: 2, a: 5}]));
-
-        // 3. Championship
         const dP = picks[conf].div;
         if (dP && dP['d0'] && dP['d1']) {
             col.appendChild(createRoundUI(conf, 'conf', "Championship", [{h: dP['d0'], a: dP['d1']}]));
@@ -165,7 +159,7 @@ function renderSuperBowl(c) {
 
 async function saveBracket() { 
     if(new Date() > kickoffs.divisional) return;
-    const { error } = await _supabase.from('playoff_picks').upsert({ id: userPhone, user_name: userName, picks: picks }); 
+    const { error } = await _supabase.from('playoff_picks').upsert({ id: userPhone, user_name: userName, phone: userPhone, picks: picks }); 
     if(error) alert(error.message); else { alert("Picks Saved!"); location.reload(); }
 }
 
@@ -173,13 +167,14 @@ async function loadLeaderboard() {
     const { data } = await _supabase.from('playoff_picks').select('*'); if(!data) return;
     const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
     document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
-        const sbSeed = e.picks.sb_winner;
-        const sbConf = e.picks.sb_winner_conf || (sbSeed <= 7 ? 'afc' : 'nfc');
+        const sbSeed = e.picks?.sb_winner;
+        const sbConf = e.picks?.sb_winner_conf || (sbSeed <= 7 ? 'afc' : 'nfc');
         const team = teamData[sbConf]?.[sbSeed];
+        const currentPoints = isNaN(e.pts) ? 0 : e.pts;
         return `<tr class="hover:bg-slate-800/50">
             <td class="p-6 font-black ${idx==0?'text-yellow-500':'text-slate-600'}">#${idx+1}</td>
             <td class="p-6 text-left font-bold uppercase text-white">${e.user_name}</td>
-            <td class="p-6 text-blue-400 font-black text-xl">${isNaN(e.pts) ? 0 : e.pts}</td>
+            <td class="p-6 text-blue-400 font-black text-xl">${currentPoints}</td>
             <td class="p-6 flex items-center justify-center gap-2 italic uppercase font-black text-[10px]">
                 ${team ? `<img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-5 h-5">${team.name}` : 'TBD'}
             </td>
@@ -191,13 +186,21 @@ function calculatePoints(uP) {
     let pts = 0; if(!uP || !realResults) return 0;
     ['afc','nfc'].forEach(c => {
         if(realResults[c]?.wc && uP[c]?.wc) {
-            Object.keys(realResults[c].wc).forEach(k => { if(uP[c].wc[k] == realResults[c].wc[k]) pts += (5 + (Number(realResults[c].wc[k]) || 0)); });
+            Object.keys(realResults[c].wc).forEach(k => { 
+                if(uP[c].wc[k] == realResults[c].wc[k]) {
+                    pts += (5 + (Number(realResults[c].wc[k]) || 0)); 
+                }
+            });
         }
         if(realResults[c]?.div && uP[c]?.div) {
-            Object.keys(realResults[c].div).forEach(k => { if(uP[c].div[k] == realResults[c].div[k]) pts += (10 + (Number(realResults[c].div[k]) || 0)); });
+            Object.keys(realResults[c].div).forEach(k => { 
+                if(uP[c].div[k] == realResults[c].div[k]) {
+                    pts += (10 + (Number(realResults[c].div[k]) || 0)); 
+                }
+            });
         }
     });
-    return pts;
+    return isNaN(pts) ? 0 : pts;
 }
 init();
 </script>
