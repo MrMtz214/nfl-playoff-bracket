@@ -19,15 +19,15 @@
         <header class="text-center py-10">
             <h1 class="text-5xl lg:text-7xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-yellow-400 uppercase tracking-tighter mb-4">ROAD TO SB LX</h1>
             <div class="inline-block bg-slate-900/80 px-8 py-3 rounded-3xl border border-slate-800 shadow-2xl">
-                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Divisional Lock Countdown</p>
-                <span id="divisional-timer" class="text-2xl font-mono font-black text-yellow-500 timer-glow uppercase italic">Loading...</span>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Divisional Lock In Countdown</p>
+                <span id="divisional-timer" class="text-2xl font-mono font-black text-yellow-500 timer-glow uppercase italic">00D 00H 00M 00S</span>
             </div>
         </header>
 
         <div id="admin-panel" class="hidden relative z-[90] mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 shadow-2xl">
             <h2 class="text-2xl font-black italic text-red-500 uppercase mb-8 tracking-tighter text-center">Commissioner Dashboard</h2>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-5 rounded-xl font-black uppercase text-xs tracking-widest italic shadow-xl">Update Official Results</button>
+            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white px-10 py-5 rounded-xl font-black uppercase text-xs tracking-widest italic shadow-xl">Update Official Standings</button>
         </div>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12">
@@ -59,7 +59,9 @@
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black tracking-widest">
                         <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6 text-left">SB Winner</th><th class="p-6">TB</th></tr>
                     </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm text-slate-300"></tbody>
+                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 italic text-sm text-slate-300">
+                        <tr><td colspan="5" class="p-10 text-slate-500 uppercase font-black italic tracking-widest">Retrieving Standings...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -90,7 +92,6 @@ let picks = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf
 
 const getLogo = (id) => `https://a.espncdn.com/i/teamlogos/nfl/500/${id}.png`;
 
-// TIMER
 function updateTimer() {
     const timerEl = document.getElementById('divisional-timer');
     if (!timerEl) return;
@@ -112,7 +113,7 @@ async function handleSimpleLogin() {
     userName = document.getElementById('login-name').value.trim();
     userPhone = document.getElementById('login-phone').value.replace(/\D/g,'');
     if(userName.length < 2 || userPhone.length < 10) { alert("Invalid Credentials."); return; }
-    const { data } = await _supabase.from('playoff_picks').select('*').eq('id', userPhone).single();
+    const { data, error } = await _supabase.from('playoff_picks').select('*').eq('id', userPhone).single();
     if (data) { picks = data.picks; userName = data.user_name; }
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
@@ -122,9 +123,12 @@ async function handleSimpleLogin() {
 }
 
 async function init() {
-    const { data: mRes } = await _supabase.from('master_results').select('*').single();
-    if(mRes) realResults = mRes.data;
-    loadLeaderboard();
+    try {
+        const { data: mRes } = await _supabase.from('master_results').select('*').single();
+        if(mRes) realResults = mRes.data;
+        await loadLeaderboard();
+        updateTimer();
+    } catch (e) { console.error("Init failed", e); }
 }
 
 function render() {
@@ -140,23 +144,23 @@ function render() {
         lockMsg.classList.remove('hidden');
     }
 
-    // AFC COLUMN - FORCED OFFICIALS
+    // AFC 
     const afcCol = document.getElementById('afc-column');
     afcCol.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8">AFC</h2>`;
     afcCol.appendChild(createRoundUI('afc', 'wc', "Wild Card Results", [[2,7], [3,6], [4,5]]));
     afcCol.appendChild(createRoundUI('afc', 'div', "Divisional Round", [{h: 1, a: 6}, {h: 2, a: 5}]));
 
-    // NFC COLUMN - FORCED OFFICIALS
+    // NFC 
     const nfcCol = document.getElementById('nfc-column');
     nfcCol.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8 lg:text-right">NFC</h2>`;
     nfcCol.appendChild(createRoundUI('nfc', 'wc', "Wild Card Results", [[2,7], [3,6], [4,5]]));
     nfcCol.appendChild(createRoundUI('nfc', 'div', "Divisional Round", [{h: 1, a: 6}, {h: 2, a: 5}]));
 
     ['afc', 'nfc'].forEach(conf => {
-        const divPicks = picks[conf].div;
-        if (divPicks['d0'] && divPicks['d1']) {
+        const divP = picks[conf].div;
+        if (divP['d0'] && divP['d1']) {
             const col = document.getElementById(conf + '-column');
-            col.appendChild(createRoundUI(conf, 'conf', "Championship Round", [{h: divPicks['d0'], a: divPicks['d1']}]));
+            col.appendChild(createRoundUI(conf, 'conf', "Championship Round", [{h: divP['d0'], a: divP['d1']}]));
         }
     });
 
@@ -175,7 +179,7 @@ function createRoundUI(conf, round, title, matchups) {
         [hS, aS].forEach(seed => {
             const team = teamData[conf][seed];
             const winner = (round === 'conf') ? realResults[conf].conf : realResults[conf][round][mKey];
-            const gScores = (realResults.scores && realResults.scores[conf][round][mKey]) ? realResults.scores[conf][round][mKey] : {};
+            const gScores = (realResults.scores?.[conf]?.[round]?.[mKey]) || {};
             const teamScore = gScores[seed] !== undefined ? gScores[seed] : "";
             let sClass = ""; if (winner) sClass = (String(winner) === String(seed)) ? "official-winner" : "official-loser";
             const isSel = (round === 'conf') ? picks[conf].conf === seed : picks[conf][round][mKey] === seed;
@@ -217,12 +221,12 @@ function renderSuperBowl(c) {
 async function renderAdminControls() {
     const ctrl = document.getElementById('admin-controls'); ctrl.innerHTML = '';
     ['afc','nfc'].forEach(conf => {
-        const sec = document.createElement('div'); sec.innerHTML = `<h3 class="uppercase font-black text-[10px] text-slate-500 mb-4 italic border-b border-slate-800 pb-2">${conf} Scoreboard</h3>`;
+        const sec = document.createElement('div'); sec.innerHTML = `<h3 class="uppercase font-black text-[10px] text-slate-500 mb-4 italic border-b border-slate-800 pb-2">${conf}</h3>`;
         const addGameAdmin = (lbl, round, mKey, seeds) => {
             const win = realResults[conf][round][mKey];
             const d = document.createElement('div'); d.className = "mb-6 p-4 bg-black/40 rounded-xl border border-slate-800";
             const s = document.createElement('select'); s.className = "bg-slate-900 border border-slate-700 p-2 w-full text-[11px] rounded mb-3 text-white italic outline-none";
-            s.innerHTML = `<option value="">Select Winner</option>` + seeds.map(seed => `<option value="${seed}" ${win == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
+            s.innerHTML = `<option value="">Winner</option>` + seeds.map(seed => `<option value="${seed}" ${win == seed ? 'selected' : ''}>${teamData[conf][seed].name}</option>`).join('');
             s.onchange = (e) => { realResults[conf][round][mKey] = e.target.value; };
             d.appendChild(s);
             const sFlex = document.createElement('div'); sFlex.className = "flex gap-2";
@@ -255,7 +259,8 @@ async function saveBracket() {
 }
 
 async function loadLeaderboard() {
-    const { data } = await _supabase.from('playoff_picks').select('*'); if(!data) return;
+    const { data, error } = await _supabase.from('playoff_picks').select('*'); 
+    if(error) { console.error(error); return; }
     const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
     document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
         const team = teamData[e.picks.sb_winner_conf || (e.picks.sb_winner <= 7 ? 'afc' : 'nfc')][e.picks.sb_winner];
@@ -264,7 +269,8 @@ async function loadLeaderboard() {
 }
 
 function calculatePoints(uP) {
-    let pts = 0; ['afc','nfc'].forEach(c => {
+    let pts = 0; if(!uP) return 0;
+    ['afc','nfc'].forEach(c => {
         Object.keys(realResults[c].wc).forEach(k => { if(realResults[c].wc[k] && uP[c].wc[k] == realResults[c].wc[k]) pts += (5 + parseInt(realResults[c].wc[k])); });
         Object.keys(realResults[c].div).forEach(k => { if(realResults[c].div[k] && uP[c].div[k] == realResults[c].div[k]) pts += (10 + parseInt(realResults[c].div[k])); });
         if(realResults[c].conf && uP[c].conf == realResults[c].conf) pts += (15 + parseInt(realResults[c].conf));
