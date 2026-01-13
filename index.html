@@ -99,14 +99,8 @@ function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
         col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8">${conf}</h2>`;
-        
-        // Wild Card Results (Hardcoded seeds to match winners)
         col.appendChild(createRoundUI(conf, 'wc', "Wild Card Results", [[2,7], [3,6], [4,5]]));
-        
-        // Divisional (Official Hardcoded Matchups: 1v6 and 2v5)
         col.appendChild(createRoundUI(conf, 'div', "Divisional Round", [{h: 1, a: 6}, {h: 2, a: 5}]));
-
-        // Championship
         if (picks[conf].div?.d0 && picks[conf].div?.d1) {
             col.appendChild(createRoundUI(conf, 'conf', "Championship", [{h: picks[conf].div.d0, a: picks[conf].div.d1}]));
         }
@@ -128,12 +122,7 @@ function createRoundUI(conf, round, title, matchups) {
             const btn = document.createElement('button');
             btn.className = `w-full p-4 flex items-center justify-between transition ${sCl} ${isS && !sCl ? 'selected' : 'hover:bg-slate-800'}`;
             btn.innerHTML = `<div class="flex items-center gap-4 text-left"><span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span><img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-8 h-8"><span class="font-bold uppercase italic text-xs text-white">${team.name}</span></div>`;
-            btn.onclick = () => { 
-                if(round==='wc' || new Date() > kickoffs.divisional) return; 
-                if(!picks[conf][round]) picks[conf][round]={}; 
-                picks[conf][round][mK]=seed; 
-                render(); 
-            };
+            btn.onclick = () => { if(round==='wc' || new Date() > kickoffs.divisional) return; if(!picks[conf][round]) picks[conf][round]={}; picks[conf][round][mK]=seed; render(); };
             card.appendChild(btn);
         });
         sec.appendChild(card);
@@ -156,7 +145,7 @@ function renderSuperBowl(c) {
 
 async function saveBracket() {
     await _supabase.from('playoff_picks').upsert({ id: userPhone, user_name: userName, phone: userPhone, picks: picks });
-    alert("Divisional Picks Saved!"); location.reload();
+    alert("Saved!"); location.reload();
 }
 
 async function loadLeaderboard() {
@@ -166,7 +155,7 @@ async function loadLeaderboard() {
         <tr class="hover:bg-slate-800/50">
             <td class="p-6 font-black text-slate-600">#${idx+1}</td>
             <td class="p-6 text-left uppercase font-bold text-white">${e.user_name}</td>
-            <td class="p-6 text-blue-400 font-black text-xl">${e.pts || 0}</td>
+            <td class="p-6 text-blue-400 font-black text-xl">${e.pts}</td>
             <td class="p-6 text-[10px] font-black uppercase text-slate-500 italic">${e.picks.sb_winner ? teamData[e.picks.sb_winner_conf || 'afc'][e.picks.sb_winner]?.name : 'TBD'}</td>
             <td class="p-6 font-mono text-emerald-500 text-xs">${e.picks.sb_score?.afc || 0}-${e.picks.sb_score?.nfc || 0}</td>
         </tr>`).join('');
@@ -176,10 +165,17 @@ function calculatePoints(uP) {
     let pts = 0; if(!uP || !realResults) return 0;
     ['afc','nfc'].forEach(c => {
         if(realResults[c]?.wc && uP[c]?.wc) {
-            Object.keys(realResults[c].wc).forEach(k => { if(uP[c].wc[k] == realResults[c].wc[k]) pts += (5 + Number(realResults[c].wc[k])); });
+            Object.keys(realResults[c].wc).forEach(k => { 
+                const res = realResults[c].wc[k];
+                if(res && uP[c].wc[k] == res) pts += (5 + Number(res)); 
+            });
         }
         if(realResults[c]?.div && uP[c]?.div) {
-            Object.keys(realResults[c].div).forEach(k => { if(uP[c].div[k] == realResults[c].div[k]) pts += (10 + Number(realResults[c].div[k])); });
+            Object.keys(realResults[c].div).forEach(k => { 
+                const res = realResults[c].div[k];
+                // GUARD: Only give points if result is not null/empty
+                if(res && res !== "" && uP[c].div[k] == res) pts += (10 + Number(res)); 
+            });
         }
     });
     return pts;
