@@ -18,7 +18,7 @@
         <header class="py-10">
             <h1 class="text-5xl lg:text-7xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-yellow-400 uppercase tracking-tighter mb-2">ROAD TO SB LX</h1>
             <div class="inline-block bg-slate-900/50 px-6 py-2 rounded-full border border-slate-800">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Divisional Lock In Countdown:</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Divisional Lock Countdown:</p>
                 <span id="divisional-timer" class="text-xl font-mono font-black text-yellow-500 italic">00D 00H 00M 00S</span>
             </div>
         </header>
@@ -33,22 +33,26 @@
         </div>
 
         <div id="main-content" class="hidden">
+            <div class="mb-12 p-6 bg-slate-900/30 rounded-3xl border border-slate-800 inline-block text-[10px] uppercase font-bold tracking-widest text-slate-400">
+                Wild Card Winners: Bills (#6), Texans (#5), Patriots (#2) | 49ers (#6), Rams (#5), Bears (#2)
+            </div>
+
             <div class="flex flex-col lg:flex-row justify-center gap-8 lg:gap-2">
                 <div id="afc-column" class="w-full lg:w-[40%] space-y-12"></div>
                 <div id="sb-column" class="w-full lg:w-[20%] lg:mt-64 flex flex-col items-center"></div>
                 <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
             </div>
             <div class="mt-20 border-t border-slate-900 pt-10">
-                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-20 py-5 rounded-full font-black text-xl uppercase italic shadow-2xl">Lock In Divisional Picks</button>
+                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-20 py-5 rounded-full font-black text-xl uppercase italic shadow-2xl">Lock In Picks</button>
             </div>
         </div>
 
         <div id="leaderboard-section" class="mt-32 max-w-5xl mx-auto">
             <h2 class="text-center text-3xl font-black italic text-slate-700 uppercase mb-10 tracking-tighter">Live Standings</h2>
-            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
+            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
                 <table class="w-full text-center">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black">
-                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6">SB Pick</th><th class="p-6">TB</th></tr>
+                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6">SB Winner</th><th class="p-6">TB</th></tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-800 text-sm text-slate-300 italic"></tbody>
                 </table>
@@ -63,13 +67,13 @@ const kickoffs = { divisional: new Date("2026-01-17T16:30:00-05:00") };
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const teamData = {
-    afc: { 1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" } },
-    nfc: { 1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" } }
+    afc: { 1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 3: { name: "Jaguars", id: "jax" }, 4: { name: "Steelers", id: "pit" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" }, 7: { name: "Chargers", id: "lac" } },
+    nfc: { 1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 3: { name: "Eagles", id: "phi" }, 4: { name: "Panthers", id: "car" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" }, 7: { name: "Packers", id: "gb" } }
 };
 
 let userPhone = ""; let userName = ""; 
 let realResults = { afc: { wc: {}, div: {} }, nfc: { wc: {}, div: {} } };
-let picks = { afc: { div: {} }, nfc: { div: {} }, sb_score: { afc: 0, nfc: 0 } };
+let picks = { afc: { wc: {}, div: {} }, nfc: { wc: {}, div: {} }, sb_score: { afc: 0, nfc: 0 } };
 
 function updateTimer() {
     const diff = kickoffs.divisional - new Date();
@@ -99,8 +103,14 @@ function render() {
     ['afc', 'nfc'].forEach(conf => {
         const col = document.getElementById(conf + '-column');
         col.innerHTML = `<h2 class="text-4xl font-black italic text-slate-800 uppercase mb-8">${conf}</h2>`;
-        col.appendChild(createRoundUI(conf, 'wc', "Wild Card Results", [[2,7], [3,6], [4,5]]));
+        
+        // Show Wild Card results fixed (non-pickable)
+        col.appendChild(createRoundUI(conf, 'wc', "Wild Card Result", [[2,7], [3,6], [4,5]]));
+        
+        // Official Divisional Matchups (Pickable)
         col.appendChild(createRoundUI(conf, 'div', "Divisional Round", [{h: 1, a: 6}, {h: 2, a: 5}]));
+
+        // Championship (Appears if Divisional picks are made)
         if (picks[conf].div?.d0 && picks[conf].div?.d1) {
             col.appendChild(createRoundUI(conf, 'conf', "Championship", [{h: picks[conf].div.d0, a: picks[conf].div.d1}]));
         }
@@ -122,7 +132,12 @@ function createRoundUI(conf, round, title, matchups) {
             const btn = document.createElement('button');
             btn.className = `w-full p-4 flex items-center justify-between transition ${sCl} ${isS && !sCl ? 'selected' : 'hover:bg-slate-800'}`;
             btn.innerHTML = `<div class="flex items-center gap-4 text-left"><span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span><img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-8 h-8"><span class="font-bold uppercase italic text-xs text-white">${team.name}</span></div>`;
-            btn.onclick = () => { if(round==='wc' || new Date() > kickoffs.divisional) return; if(!picks[conf][round]) picks[conf][round]={}; picks[conf][round][mK]=seed; render(); };
+            btn.onclick = () => { 
+                if(round==='wc' || new Date() > kickoffs.divisional) return; 
+                if(!picks[conf][round]) picks[conf][round]={}; 
+                picks[conf][round][mK]=seed; 
+                render(); 
+            };
             card.appendChild(btn);
         });
         sec.appendChild(card);
@@ -145,20 +160,24 @@ function renderSuperBowl(c) {
 
 async function saveBracket() {
     await _supabase.from('playoff_picks').upsert({ id: userPhone, user_name: userName, phone: userPhone, picks: picks });
-    alert("Saved!"); location.reload();
+    alert("Divisional Picks Saved!"); location.reload();
 }
 
 async function loadLeaderboard() {
     const { data } = await _supabase.from('playoff_picks').select('*'); if(!data) return;
     const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks) })).sort((a,b) => b.pts - a.pts);
-    document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => `
+    document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
+        const team = teamData[e.picks.sb_winner_conf || (e.picks.sb_winner <= 7 ? 'afc' : 'nfc')]?.[e.picks.sb_winner];
+        return `
         <tr class="hover:bg-slate-800/50">
             <td class="p-6 font-black text-slate-600">#${idx+1}</td>
             <td class="p-6 text-left uppercase font-bold text-white">${e.user_name}</td>
-            <td class="p-6 text-blue-400 font-black text-xl">${e.pts}</td>
-            <td class="p-6 text-[10px] font-black uppercase text-slate-500 italic">${e.picks.sb_winner ? teamData[e.picks.sb_winner_conf || 'afc'][e.picks.sb_winner]?.name : 'TBD'}</td>
+            <td class="p-6 text-blue-400 font-black text-xl">${e.pts || 0}</td>
+            <td class="p-6 text-[10px] font-black uppercase text-slate-500 italic flex items-center gap-2">
+                ${team ? `<img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-6 h-6"> ${team.name}` : 'TBD'}
+            </td>
             <td class="p-6 font-mono text-emerald-500 text-xs">${e.picks.sb_score?.afc || 0}-${e.picks.sb_score?.nfc || 0}</td>
-        </tr>`).join('');
+        </tr>`}).join('');
 }
 
 function calculatePoints(uP) {
@@ -173,8 +192,7 @@ function calculatePoints(uP) {
         if(realResults[c]?.div && uP[c]?.div) {
             Object.keys(realResults[c].div).forEach(k => { 
                 const res = realResults[c].div[k];
-                // GUARD: Only give points if result is not null/empty
-                if(res && res !== "" && uP[c].div[k] == res) pts += (10 + Number(res)); 
+                if(res && uP[c].div[k] == res) pts += (10 + Number(res)); 
             });
         }
     });
