@@ -47,7 +47,7 @@
                 <div id="nfc-column" class="w-full lg:w-[40%] space-y-12 lg:text-right"></div>
             </div>
             <div class="mt-20 border-t border-slate-900 pt-10 text-center">
-                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-20 py-5 rounded-full font-black text-xl uppercase italic shadow-2xl transition-all">Lock In My Picks</button>
+                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-20 py-5 rounded-full font-black text-xl uppercase italic shadow-2xl">Lock In My Picks</button>
                 <p id="lock-msg" class="text-red-500 font-black uppercase text-[10px] mt-4 hidden italic">🚫 Entries Closed</p>
             </div>
         </div>
@@ -62,7 +62,7 @@
             </div>
 
             <div id="rules-modal" class="hidden mb-10 p-8 bg-slate-900 rounded-3xl border border-slate-800 text-left shadow-2xl">
-                <h3 class="text-blue-400 font-black uppercase italic mb-4">Scoring Rules</h3>
+                <h3 class="text-blue-400 font-black uppercase italic mb-4 italic">Scoring Rules</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs text-slate-400">
                     <div>
                         <p class="font-bold text-white mb-2 uppercase tracking-widest">Points Per Round:</p>
@@ -79,7 +79,7 @@
             <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
                 <table class="w-full text-center">
                     <thead class="bg-black text-slate-500 text-[10px] uppercase font-black">
-                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6">SB Winner</th><th class="p-6">TB</th></tr>
+                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6">SB Pick</th><th class="p-6">TB</th></tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-800 text-sm text-slate-300 italic"></tbody>
                 </table>
@@ -102,7 +102,7 @@ const teamData = {
 };
 
 let userPhone = ""; let userName = ""; 
-let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, sb_winner: null, sb_winner_conf: null, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } } };
+let realResults = { afc: { wc: {}, div: {}, conf: null }, nfc: { wc: {}, div: {}, conf: null }, scores: { afc: { wc: {}, div: {}, conf: {} }, nfc: { wc: {}, div: {}, conf: {} } } };
 let picks = { afc: { div: {} }, nfc: { div: {} }, sb_score: { afc: 0, nfc: 0 } };
 
 function updateTimer() {
@@ -117,14 +117,14 @@ setInterval(updateTimer, 1000);
 function calculatePoints(uP) {
     let pts = 0; if(!uP || !realResults) return 0;
     ['afc','nfc'].forEach(c => {
-        if(realResults[c]?.wc && uP.wc?.[c]) {
+        if(realResults[c]?.wc && uP[c]?.wc) {
             Object.keys(realResults[c].wc).forEach(k => { 
-                if(realResults[c].wc[k] && uP.wc[c][k] == realResults[c].wc[k]) pts += (5 + Number(realResults[c].wc[k])); 
+                if(realResults[c].wc[k] && uP[c].wc[k] == realResults[c].wc[k]) pts += (5 + Number(realResults[c].wc[k])); 
             });
         }
-        if(realResults[c]?.div && uP.div?.[c]) {
+        if(realResults[c]?.div && uP[c]?.div) {
             Object.keys(realResults[c].div).forEach(k => { 
-                if(realResults[c].div[k] && uP.div[c][k] == realResults[c].div[k]) pts += (10 + Number(realResults[c].div[k])); 
+                if(realResults[c].div[k] && uP[c].div[k] == realResults[c].div[k]) pts += (10 + Number(realResults[c].div[k])); 
             });
         }
         if(realResults[c]?.conf && uP[c]?.conf == realResults[c].conf) pts += (15 + Number(realResults[c].conf));
@@ -150,7 +150,6 @@ async function init() {
     const { data } = await _supabase.from('master_results').select('*').single();
     if(data) realResults = data.data;
     loadLeaderboard();
-    updateTimer();
 }
 
 function render() {
@@ -200,8 +199,8 @@ function renderSuperBowl(c) {
             d.onclick = () => { if(new Date() < kickoffs.championship){picks.sb_winner=t.seed; picks.sb_winner_conf=t.conf; render();} }; flex.appendChild(d);
         });
         c.appendChild(flex);
-        c.innerHTML += `<div class="bg-black/50 p-6 rounded-3xl border border-slate-800 text-center w-full"><p class="text-[10px] font-black text-yellow-500 mb-4 uppercase italic">Tiebreaker</p><div class="flex justify-center gap-4"><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score.afc || 0}" class="w-16 p-2 bg-slate-900 rounded text-center text-white"><span class="font-black text-slate-600">VS</span><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score.nfc || 0}" class="w-16 p-2 bg-slate-900 rounded text-center text-white"></div></div>`;
-    } else { c.innerHTML += `<p class="text-[10px] text-slate-500 uppercase italic">Pick Championship Winners to Unlock</p>`; }
+        c.innerHTML += `<div class="bg-black/50 p-6 rounded-3xl border border-slate-800 text-center w-full"><p class="text-[10px] font-black text-yellow-500 mb-4 uppercase italic">Tiebreaker</p><div class="flex justify-center gap-4"><input type="number" oninput="picks.sb_score.afc=this.value" value="${picks.sb_score?.afc || 0}" class="w-16 p-2 bg-slate-900 rounded text-center text-white"><span class="font-black text-slate-600">VS</span><input type="number" oninput="picks.sb_score.nfc=this.value" value="${picks.sb_score?.nfc || 0}" class="w-16 p-2 bg-slate-900 rounded text-center text-white"></div></div>`;
+    } else { c.innerHTML += `<p class="text-[10px] text-slate-500 uppercase italic">Pick Conference Winners to Unlock</p>`; }
 }
 
 function renderAdminControls() {
