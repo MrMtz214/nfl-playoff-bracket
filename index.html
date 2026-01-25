@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROAD TO SB LX | Championship Sunday</title>
+    <title>ROAD TO SB LX | Locked Bracket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
+        .selected { background-color: #1d4ed8 !important; border-color: #60a5fa !important; color: white !important; transform: scale(1.05); }
         .official-winner { background-color: #059669 !important; border-color: #34d399 !important; color: white !important; }
         .official-loser { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
-        .admin-glow { border: 2px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+        /* Disable hover effects when locked */
+        .locked-btn { pointer-events: none; cursor: default; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans text-center">
@@ -18,13 +19,15 @@
     <div class="max-w-7xl mx-auto px-4">
         <header class="py-10">
             <h1 class="text-5xl lg:text-7xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-yellow-400 uppercase tracking-tighter mb-2">ROAD TO SB LX</h1>
-            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Championship Sunday Recap: NE 10, DEN 7</p>
+            <div class="inline-block bg-slate-900/50 px-6 py-2 rounded-full border border-slate-800">
+                <span id="champ-timer" class="text-xl font-mono font-black text-red-500 uppercase italic">🔒 BRACKET LOCKED</span>
+            </div>
         </header>
 
-        <div id="admin-panel" class="hidden mb-12 p-8 bg-slate-900 rounded-3xl admin-glow max-w-4xl mx-auto text-left">
+        <div id="admin-panel" class="hidden mb-12 p-8 bg-slate-900 rounded-3xl border-2 border-red-500/20 max-w-4xl mx-auto text-left">
             <h2 class="text-2xl font-black italic text-red-500 uppercase mb-8 text-center">Commissioner Dashboard</h2>
             <div id="admin-controls" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
-            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white py-5 rounded-xl font-black uppercase italic shadow-xl transition-all">Update Official Results</button>
+            <button onclick="saveAdminScores()" class="mt-8 w-full bg-red-600 hover:bg-red-500 text-white py-5 rounded-xl font-black uppercase italic shadow-xl">Update Official Results</button>
         </div>
 
         <div id="auth-section" class="max-w-md mx-auto bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-2xl mb-12">
@@ -32,38 +35,19 @@
             <div class="space-y-4">
                 <input type="text" id="login-name" placeholder="Full Name" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none">
                 <input type="tel" id="login-phone" placeholder="Phone Number" class="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl text-white outline-none">
-                <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200">Enter Pool</button>
+                <button onclick="handleSimpleLogin()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase tracking-widest hover:bg-slate-200">View My Bracket</button>
             </div>
         </div>
 
         <div id="main-content" class="hidden">
             <div id="user-display" class="text-slate-500 font-bold uppercase text-[10px] mb-8 italic tracking-widest text-center"></div>
-            
             <div class="flex flex-col lg:flex-row justify-center gap-8 lg:gap-2">
                 <div id="afc-column" class="w-full lg:w-[35%] space-y-12"></div>
                 <div id="sb-column" class="w-full lg:w-[30%] lg:mt-32 flex flex-col items-center"></div>
                 <div id="nfc-column" class="w-full lg:w-[35%] space-y-12 lg:text-right"></div>
             </div>
-            
             <div class="mt-20 border-t border-slate-900 pt-10 text-center">
-                <button id="save-btn" onclick="saveBracket()" class="bg-emerald-600 px-20 py-5 rounded-full font-black text-xl uppercase italic shadow-2xl transition-all">Lock In Final Picks</button>
-            </div>
-        </div>
-
-        <div id="leaderboard-section" class="mt-32 max-w-5xl mx-auto">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-black italic text-slate-700 uppercase tracking-tighter">Live Standings</h2>
-                <div class="inline-block mt-4 px-6 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                    <p class="text-emerald-400 font-black uppercase text-[10px] tracking-widest">💰 Jackpot: <span id="jackpot-amount" class="text-white ml-1 font-mono">$0</span></p>
-                </div>
-            </div>
-            <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl overflow-x-auto">
-                <table class="w-full text-center">
-                    <thead class="bg-black text-slate-500 text-[10px] uppercase font-black">
-                        <tr><th class="p-6">Rank</th><th class="p-6 text-left">Predictor</th><th class="p-6">Score</th><th class="p-6">SB Pick</th><th class="p-6">TB</th></tr>
-                    </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-slate-800 text-sm text-slate-300 italic"></tbody>
-                </table>
+                <p class="text-red-500 font-black uppercase text-xl italic">🚫 Picks are Locked for Super Bowl LX</p>
             </div>
         </div>
     </div>
@@ -72,35 +56,22 @@
 const SUPABASE_URL = 'https://qqqsdhtwlbhnlkuzjiwu.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_EV3pltkn-OfizajBL7ApeQ_QDOBkNPl'; 
 const COMMISSIONER_PHONE = '2147143522';
-
-const { createClient } = supabase;
-const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// HARD LOCK SET TO 5:00 PM TODAY
+const kickoffs = { championship: new Date("2026-01-25T17:00:00-05:00") };
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const teamData = {
     afc: { 1: { name: "Broncos", id: "den" }, 2: { name: "Patriots", id: "ne" }, 5: { name: "Texans", id: "hou" }, 6: { name: "Bills", id: "buf" } },
     nfc: { 1: { name: "Seahawks", id: "sea" }, 2: { name: "Bears", id: "chi" }, 5: { name: "Rams", id: "lar" }, 6: { name: "49ers", id: "sf" } }
 };
 
-let userPhone = ""; 
-let realResults = { afc: { div: {}, conf: null }, nfc: { div: {}, conf: null }, sb_winner: null, scores: { afc: { conf: { champ: {} } }, nfc: { conf: { champ: {} } } } };
-let picks = { afc: { conf: null }, nfc: { conf: null }, sb_winner: null, sb_winner_conf: null, sb_score: { afc: 0, nfc: 0 } };
-
-function calculatePoints(uP) {
-    let pts = 0; if(!uP || !realResults) return 0;
-    ['afc','nfc'].forEach(c => {
-        const cp = uP[c] || {}; const cr = realResults[c] || {};
-        if(cr.wc && cp.wc) Object.keys(cr.wc).forEach(k => { if(cr.wc[k] && cp.wc[k] == cr.wc[k]) pts += (5 + Number(cr.wc[k])); });
-        if(cr.div && cp.div) Object.keys(cr.div).forEach(k => { if(cr.div[k] && cp.div[k] == cr.div[k]) pts += (10 + Number(cr.div[k])); });
-        if(cr.conf && cp.conf == cr.conf) pts += (15 + Number(cr.conf));
-    });
-    if(realResults.sb_winner && uP.sb_winner == realResults.sb_winner) pts += (20 + Number(realResults.sb_winner));
-    return pts;
-}
+let userPhone = ""; let realResults = { afc: { conf: null }, nfc: { conf: null }, scores: { afc: { conf: { champ: {} } }, nfc: { conf: { champ: {} } } } };
+let picks = { afc: { conf: null }, nfc: { conf: null }, sb_winner: null };
 
 async function handleSimpleLogin() {
     userPhone = document.getElementById('login-phone').value.replace(/\D/g,'');
     const { data } = await _supabase.from('playoff_picks').select('*').eq('id', userPhone).single();
-    if (data && data.picks) picks = data.picks;
+    if (data) picks = data.picks;
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     if(userPhone === COMMISSIONER_PHONE) { document.getElementById('admin-panel').classList.remove('hidden'); renderAdminControls(); }
@@ -127,13 +98,13 @@ function createRoundUI(conf, round, title, matchups) {
         [hS, aS].forEach(seed => {
             const team = teamData[conf][seed];
             const win = realResults[conf][round === 'conf' ? 'conf' : 'div']?.[mK] || realResults[conf][round];
-            const score = realResults.scores?.[conf]?.[round === 'conf' ? 'conf' : 'div']?.[mK]?.[seed] || realResults.scores?.[conf]?.[round]?.[mK]?.[seed] || "";
+            const score = realResults.scores?.[conf]?.[round === 'conf' ? 'conf' : 'div']?.[mK]?.[seed] || "";
             let sCl = win ? (String(win)===String(seed)?"official-winner":"official-loser") : "";
             const isS = (round==='conf') ? (picks[conf]?.conf==seed) : (picks[conf]?.div?.[mK]==seed);
-            const btn = document.createElement('button');
-            btn.className = `w-full p-4 flex items-center justify-between transition ${sCl} ${isS && !sCl ? 'selected' : 'hover:bg-slate-800'}`;
+            
+            const btn = document.createElement('div'); // CHANGED FROM BUTTON TO DIV TO KILL CLICKS
+            btn.className = `w-full p-4 flex items-center justify-between transition ${sCl} ${isS && !sCl ? 'selected' : ''} locked-btn`;
             btn.innerHTML = `<div class="flex items-center gap-4 text-left"><span class="text-[10px] font-bold text-slate-500 w-4">${seed}</span><img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-8 h-8"><span class="font-bold uppercase italic text-xs text-white">${team.name}</span></div><span class="text-white font-mono font-bold">${score}</span>`;
-            btn.onclick = () => { if(!win && round !== 'div'){ picks[conf].conf=seed; render(); } };
             card.appendChild(btn);
         });
         sec.appendChild(card);
@@ -148,16 +119,13 @@ function renderSuperBowl(c) {
         const flex = document.createElement('div'); flex.className = "flex lg:flex-col gap-6 items-center mb-8";
         [{conf:'afc', seed:afcP}, {conf:'nfc', seed:nfcP}].forEach(t => {
             const team = teamData[t.conf][t.seed]; const isS = (picks.sb_winner == t.seed && picks.sb_winner_conf == t.conf);
-            const d = document.createElement('div'); d.className = `p-6 rounded-3xl border-2 transition-all ${isS?'selected scale-110 border-blue-400':'bg-slate-900 border-slate-800'} cursor-pointer`;
+            const d = document.createElement('div'); d.className = `p-6 rounded-3xl border-2 ${isS?'selected scale-110 border-blue-400':'bg-slate-900 border-slate-800'} locked-btn`;
             d.innerHTML = `<img src="https://a.espncdn.com/i/teamlogos/nfl/500/${team.id}.png" class="w-24 h-24 mb-2 mx-auto"><p class="font-black italic uppercase text-[10px] text-center text-white">${team.name}</p>`;
-            d.onclick = () => { picks.sb_winner=t.seed; picks.sb_winner_conf=t.conf; render(); }; flex.appendChild(d);
+            flex.appendChild(d);
         });
         c.appendChild(flex);
-        c.innerHTML += `<div class="bg-black/50 p-6 rounded-3xl border border-slate-800 text-center w-full"><p class="text-[10px] font-black text-yellow-500 mb-4 uppercase italic">Tiebreaker Score</p><div class="flex justify-center gap-4"><input type="number" id="tb-afc" class="w-16 p-2 bg-slate-900 rounded text-center text-white" value="${picks.sb_score?.afc || 0}"> <span class="font-black text-slate-600">VS</span> <input type="number" id="tb-nfc" class="w-16 p-2 bg-slate-900 rounded text-center text-white" value="${picks.sb_score?.nfc || 0}"></div></div>`;
-        const inA = c.querySelector('#tb-afc'); const inN = c.querySelector('#tb-nfc');
-        if(inA) inA.oninput = (e) => { picks.sb_score.afc = e.target.value; };
-        if(inN) inN.oninput = (e) => { picks.sb_score.nfc = e.target.value; };
-    } else { c.innerHTML += `<p class="p-8 text-[10px] text-slate-500 uppercase italic">Select winners to unlock</p>`; }
+        c.innerHTML += `<div class="bg-black/50 p-6 rounded-3xl border border-slate-800 text-center w-full"><p class="text-[10px] font-black text-yellow-500 mb-4 uppercase italic">Tiebreaker Prediction</p><div class="flex justify-center gap-4"><span class="text-2xl font-bold">${picks.sb_score?.afc || 0}</span> <span class="text-slate-600">VS</span> <span class="text-2xl font-bold">${picks.sb_score?.nfc || 0}</span></div></div>`;
+    } else { c.innerHTML += `<p class="p-8 text-[10px] text-slate-500 uppercase italic">No picks saved before lock</p>`; }
 }
 
 function renderAdminControls() {
@@ -184,16 +152,6 @@ function renderAdminControls() {
 }
 
 async function saveAdminScores() { await _supabase.from('master_results').upsert({ id: 1, data: realResults }); alert("Results Saved!"); location.reload(); }
-async function saveBracket() { await _supabase.from('playoff_picks').upsert({ id: userPhone, picks: picks }); alert("Picks Saved!"); location.reload(); }
-
-async function loadLeaderboard() {
-    const { data } = await _supabase.from('playoff_picks').select('*'); if(!data) return;
-    document.getElementById('jackpot-amount').innerText = `$${data.length * 25}`;
-    const scored = data.map(e => ({ ...e, pts: calculatePoints(e.picks || {}) })).sort((a,b) => b.pts - a.pts);
-    document.getElementById('leaderboard-body').innerHTML = scored.map((e, idx) => {
-        const p = e.picks || {}; const sbT = teamData[p.sb_winner_conf || (p.sb_winner <= 7 ? 'afc' : 'nfc')]?.[p.sb_winner];
-        return `<tr class="hover:bg-slate-800/50"><td class="p-6 font-black text-slate-600">#${idx+1}</td><td class="p-6 text-left uppercase font-bold text-white">${e.user_name || 'Predictor'}</td><td class="p-6 text-blue-400 font-black text-xl">${e.pts || 0}</td><td class="p-6 text-[10px] font-black uppercase text-slate-500 italic flex items-center justify-center">${sbT ? `<img src="https://a.espncdn.com/i/teamlogos/nfl/500/${sbT.id}.png" class="w-6 h-6"> ${sbT.name}` : 'TBD'}</td><td class="p-6 font-mono text-emerald-500 text-xs">${p.sb_score?.afc || 0}-${p.sb_score?.nfc || 0}</td></tr>`}).join('');
-}
 
 async function init() {
     const { data } = await _supabase.from('master_results').select('*').single();
